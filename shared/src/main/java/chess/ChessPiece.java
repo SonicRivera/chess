@@ -117,8 +117,8 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         if (this.getPieceType() == PieceType.BISHOP){
-            BishopMovesCalculator bishop = new BishopMovesCalculator(board, myPosition, this);
-            return bishop.calculateMoves();
+            BishopMovesCalculator Bishop = new BishopMovesCalculator(board, myPosition, this);
+            return Bishop.calculateMoves();
 
         } else if (this.getPieceType() == PieceType.KING) {
 

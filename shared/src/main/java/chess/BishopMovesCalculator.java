@@ -5,15 +5,13 @@ import java.util.ArrayList;
 public class BishopMovesCalculator extends PieceMovesCalculator {
 
 
-    private final ChessPosition startPosition;
-    private final ChessPiece piece;
-    private int row;
-    private int col;
     private final ChessBoard Cboard;
+    private final ChessPiece piece;
+    private final int row;
+    private final int col;
 
     public BishopMovesCalculator(ChessBoard board, ChessPosition startPosition, ChessPiece piece) {
         super(board, startPosition, piece);
-        this.startPosition = startPosition;
         this.piece = piece;
         this.row = startPosition.getRow();
         this.col = startPosition.getColumn();
@@ -21,15 +19,9 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
 
 
         if (this.piece.getPieceType() != ChessPiece.PieceType.BISHOP){
-            throw new IllegalArgumentException("BishopMovesCalculator can only be used with BISHOP pieces.");
+            throw new IllegalArgumentException("BishopMovesCalculator can only be used with Bishop pieces.");
         }
 
-    }
-
-    public void resetStart(){
-        this.row = startPosition.getRow();
-        this.col = startPosition.getColumn();
-        this.piece.past = false;
     }
 
     @Override
@@ -52,75 +44,33 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         ChessPosition end;
 
         ArrayList<ChessMove> moves = new ArrayList<>();
-       //Check for moving up left
-        resetStart();
-       while (true){
-           this.row += 1;
-           this.col -= 1;
-           end = new ChessPosition(this.row, this.col);
-           if (row > 8 || col < 1){
-               break;
-           } else if (Blocked(Cboard, end, this.piece)) {
-               break;
-           } else  {
-            end = new ChessPosition(this.row, this.col);
-            moves.add(new ChessMove(start, end, null));
+        int[][] directions = {
+                {1, 1}, {-1, 1}, {-1, -1}, {1, -1}
+        };
+
+       //Check all directions in one for loop
+       for (int[] direction:directions){
+           int newRow = start.getRow();
+           int newCol = start.getColumn();
+           piece.past = false;
+
+           while (true){
+               newRow += direction[0];
+               newCol += direction[1];
+
+               if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+                    break;
+               }
+
+               end = new ChessPosition(newRow, newCol);
+               if (Blocked(Cboard,end,piece)) {
+                    break;
+               }
+
+               moves.add(new ChessMove(start, end, null));
            }
 
        }
-
-
-
-        //Check moves for moving up right
-        resetStart();
-        while (true){
-            this.row += 1;
-            this.col += 1;
-            end = new ChessPosition(this.row, this.col);
-            if (row > 8 || col > 8){
-                break;
-            } else if (Blocked(Cboard, end, this.piece)) {
-                break;
-            } else  {
-                end = new ChessPosition(this.row, this.col);
-                moves.add(new ChessMove(start, end, null));
-            }
-
-        }
-
-        //check for moving down left
-        resetStart();
-        while (true){
-            this.row -= 1;
-            this.col -= 1;
-            end = new ChessPosition(this.row, this.col);
-            if (row < 1 || col < 1){
-                break;
-            } else if (Blocked(Cboard, end, this.piece)) {
-                break;
-            } else  {
-                end = new ChessPosition(this.row, this.col);
-                moves.add(new ChessMove(start, end, null));
-            }
-
-        }
-
-        //check for moving down right
-        resetStart();
-        while (true){
-            this.row -= 1;
-            this.col += 1;
-            end = new ChessPosition(this.row, this.col);
-            if (row < 1 ||  col > 8){
-                break;
-            } else if (Blocked(Cboard, end, this.piece)) {
-                break;
-            } else  {
-                end = new ChessPosition(this.row, this.col);
-                moves.add(new ChessMove(start, end, null));
-            }
-
-        }
 
         return moves;
     }
