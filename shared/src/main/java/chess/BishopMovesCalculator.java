@@ -1,6 +1,5 @@
 package chess;
 
-import java.sql.Array;
 import java.util.ArrayList;
 
 public class BishopMovesCalculator extends PieceMovesCalculator {
@@ -10,7 +9,7 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
     private final ChessPiece piece;
     private int row;
     private int col;
-    private ChessBoard Cboard;
+    private final ChessBoard Cboard;
 
     public BishopMovesCalculator(ChessBoard board, ChessPosition startPosition, ChessPiece piece) {
         super(board, startPosition, piece);
@@ -50,7 +49,7 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         Cboard.printBoard();
 
         ChessPosition start = new ChessPosition(this.row, this.col);
-        ChessPosition end = new ChessPosition(0, 0);
+        ChessPosition end;
 
         ArrayList<ChessMove> moves = new ArrayList<>();
        //Check for moving up left
