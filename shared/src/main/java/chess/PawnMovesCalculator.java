@@ -9,8 +9,6 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
     private final int row;
     private final int col;
     private final ChessBoard Cboard;
-    private boolean firstMove;
-    private int color;
 
     public PawnMovesCalculator(ChessBoard board, ChessPosition startPosition, ChessPiece piece) {
         super(board, startPosition, piece);
@@ -18,7 +16,6 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         this.row = startPosition.getRow();
         this.col = startPosition.getColumn();
         this.Cboard = board;
-        this.firstMove = true;
 
 
 
@@ -74,6 +71,23 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
             }
         }
 
+        int[][] captureDirections = {{direction, 1}, {direction, -1}};
+        for (int[] captureDirection : captureDirections) {
+            end = new ChessPosition(this.row + captureDirection[0], this.col + captureDirection[1]);
+            if (end.getRow() >= 1 && end.getRow() <= 8 && end.getColumn() >= 1 && end.getColumn() <= 8) {
+                ChessPiece targetPiece = Cboard.getPiece(end);
+                if (targetPiece != null && targetPiece.getTeamColor() != piece.getTeamColor()) {
+                    if (end.getRow() == promotionRow){
+                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.QUEEN));
+                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.ROOK));
+                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.BISHOP));
+                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.KNIGHT));
+                    } else {
+                    moves.add(new ChessMove(start, end, null));
+                    }
+                }
+            }
+        }
         return moves;
     }
 
