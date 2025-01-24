@@ -60,6 +60,35 @@ public class ChessPiece {
         return this.type;
     }
 
+    public String getSymbol(){
+        if (this.getPieceType() == PieceType.KING) {
+            return "K";
+
+        }
+        if (this.getPieceType() == PieceType.BISHOP) {
+            return "B";
+
+        }
+        if (this.getPieceType() == PieceType.KNIGHT) {
+            return "N";
+
+        }
+        if (this.getPieceType() == PieceType.PAWN) {
+            return "P";
+
+        }
+        if (this.getPieceType() == PieceType.QUEEN) {
+            return "Q";
+
+        }
+        if (this.getPieceType() == PieceType.ROOK) {
+            return "R";
+
+        }
+
+        else return null;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -68,7 +97,9 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        BishopMovesCalculator bishop = new BishopMovesCalculator(board, myPosition, PieceType.BISHOP);
-        return bishop.calculateMoves();
+//        BishopMovesCalculator bishop = new BishopMovesCalculator(board, myPosition, PieceType.BISHOP);
+//        return bishop.calculateMoves();
+        KingMovesCalculator King = new KingMovesCalculator(board, myPosition, board.getPiece(myPosition));
+        return King.calculateMoves();
     }
 }
