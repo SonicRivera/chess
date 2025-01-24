@@ -53,7 +53,6 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
 
         ArrayList<ChessMove> moves = new ArrayList<>();
        //Check for moving up left
-        System.out.println("Checking up left");
         resetStart();
        while (true){
            this.row += 1;
@@ -74,7 +73,6 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
 
         //Check moves for moving up right
         resetStart();
-       System.out.println("Checking up right");
         while (true){
             this.row += 1;
             this.col += 1;
@@ -91,7 +89,6 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         }
 
         //check for moving down left
-        System.out.println("Checking down left");
         resetStart();
         while (true){
             this.row -= 1;
@@ -109,7 +106,6 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         }
 
         //check for moving down right
-        System.out.println("Checking down right");
         resetStart();
         while (true){
             this.row -= 1;

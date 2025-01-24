@@ -119,10 +119,35 @@ public class ChessPiece {
         if (this.getPieceType() == PieceType.BISHOP){
             BishopMovesCalculator bishop = new BishopMovesCalculator(board, myPosition, this);
             return bishop.calculateMoves();
-        } else if (this.getPieceType() == PieceType.KING){
 
-        KingMovesCalculator King = new KingMovesCalculator(board, myPosition, board.getPiece(myPosition));
-        return King.calculateMoves();
+        } else if (this.getPieceType() == PieceType.KING) {
+
+            KingMovesCalculator King = new KingMovesCalculator(board, myPosition, board.getPiece(myPosition));
+            return King.calculateMoves();
+
+        } else if (this.getPieceType() == PieceType.KNIGHT){
+
+            KnightMovesCalculator Knight = new KnightMovesCalculator(board,myPosition, board.getPiece(myPosition));
+            return Knight.calculateMoves();
+
+        } else if (this.getPieceType() == PieceType.PAWN){
+
+            return new ArrayList<>();
+//            PawnMovesCalculator Pawn = new PawnMovesCalculator(board,myPosition, board.getPiece(myPosition));
+//            return Pawn.calculateMoves();
+
+        } else if (this.getPieceType() == PieceType.QUEEN){
+
+            return new ArrayList<>();
+//            QueenMovesCalculator Queen = new QueenMovesCalculator(board,myPosition, board.getPiece(myPosition));
+//            return Queen.calculateMoves();
+
+        } else if (this.getPieceType() == PieceType.ROOK){
+
+            return new ArrayList<>();
+//            RookMovesCalculator Rook = new RookMovesCalculator(board,myPosition, board.getPiece(myPosition));
+//            return Rook.calculateMoves();
+
         }
 
         return new ArrayList<>();
