@@ -142,9 +142,8 @@ public class ChessPiece {
 
         } else if (this.getPieceType() == PieceType.ROOK){
 
-            return new ArrayList<>();
-//            RookMovesCalculator Rook = new RookMovesCalculator(board,myPosition, board.getPiece(myPosition));
-//            return Rook.calculateMoves();
+            RookMovesCalculator Rook = new RookMovesCalculator(board,myPosition, board.getPiece(myPosition));
+            return Rook.calculateMoves();
 
         }
 
