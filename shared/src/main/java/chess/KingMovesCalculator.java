@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class KingMovesCalculator extends PieceMovesCalculator {
 
-    private final ChessPosition startPosition;
     private final ChessPiece piece;
     private int row;
     private int col;
@@ -12,7 +11,6 @@ public class KingMovesCalculator extends PieceMovesCalculator {
 
     public KingMovesCalculator(ChessBoard board, ChessPosition startPosition, ChessPiece piece) {
         super(board, startPosition, piece);
-        this.startPosition = startPosition;
         this.piece = piece;
         this.row = startPosition.getRow();
         this.col = startPosition.getColumn();
