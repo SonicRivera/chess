@@ -132,15 +132,13 @@ public class ChessPiece {
 
         } else if (this.getPieceType() == PieceType.PAWN){
 
-            return new ArrayList<>();
-//            PawnMovesCalculator Pawn = new PawnMovesCalculator(board,myPosition, board.getPiece(myPosition));
-//            return Pawn.calculateMoves();
+            PawnMovesCalculator Pawn = new PawnMovesCalculator(board,myPosition, board.getPiece(myPosition));
+            return Pawn.calculateMoves();
 
         } else if (this.getPieceType() == PieceType.QUEEN){
 
-            return new ArrayList<>();
-//            QueenMovesCalculator Queen = new QueenMovesCalculator(board,myPosition, board.getPiece(myPosition));
-//            return Queen.calculateMoves();
+            QueenMovesCalculator Queen = new QueenMovesCalculator(board,myPosition, board.getPiece(myPosition));
+            return Queen.calculateMoves();
 
         } else if (this.getPieceType() == PieceType.ROOK){
 
