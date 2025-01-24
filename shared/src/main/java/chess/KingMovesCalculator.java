@@ -18,7 +18,7 @@ public class KingMovesCalculator extends PieceMovesCalculator {
         this.col = startPosition.getColumn();
         this.Cboard = board;
 
-        if (piece.getPieceType() != ChessPiece.PieceType.KING) {
+        if (this.piece.getPieceType() != ChessPiece.PieceType.KING) {
             throw new IllegalArgumentException("KingMovesCalculator can only be used with KING pieces.");
         }
     }
