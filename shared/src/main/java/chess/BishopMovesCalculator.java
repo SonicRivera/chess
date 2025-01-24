@@ -40,18 +40,17 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
 
         ArrayList<ChessMove> moves = new ArrayList<>();
        //Check for moving up left
+        System.out.println("Checking up left");
         resetStart();
        while (true){
            this.row += 1;
            this.col -= 1;
-           ChessPosition pos = new ChessPosition(row, col);
-           if (row > 7 || col < 1){
-               end = new ChessPosition(this.row+1, this.col-1);
-               if (super.Blocked(Cboard, end, this.piece)) {
-                   break;
-               }
+           end = new ChessPosition(this.row, this.col);
+           if (row > 8 || col < 1){
                break;
-           } else {
+           } else if (super.Blocked(Cboard, end, this.piece)) {
+               break;
+           } else  {
             end = new ChessPosition(this.row, this.col);
             moves.add(new ChessMove(start, end, null));
            }
@@ -62,17 +61,16 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
 
         //Check moves for moving up right
         resetStart();
+       System.out.println("Checking up right");
         while (true){
             this.row += 1;
             this.col += 1;
-            ChessPosition pos = new ChessPosition(row, col);
-            if (row > 7 || col > 7){
-                end = new ChessPosition(this.row+1, this.col-1);
-                if (super.Blocked(Cboard, end, this.piece)) {
-                    break;
-                }
+            end = new ChessPosition(this.row, this.col);
+            if (row > 8 || col > 8){
                 break;
-            } else {
+            } else if (super.Blocked(Cboard, end, this.piece)) {
+                break;
+            } else  {
                 end = new ChessPosition(this.row, this.col);
                 moves.add(new ChessMove(start, end, null));
             }
@@ -80,18 +78,17 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         }
 
         //check for moving down left
+        System.out.println("Checking down left");
         resetStart();
         while (true){
             this.row -= 1;
             this.col -= 1;
-            ChessPosition pos = new ChessPosition(row, col);
+            end = new ChessPosition(this.row, this.col);
             if (row < 1 || col < 1){
-                end = new ChessPosition(this.row+1, this.col-1);
-                if (super.Blocked(Cboard, end, this.piece)) {
-                    break;
-                }
                 break;
-            } else {
+            } else if (super.Blocked(Cboard, end, this.piece)) {
+                break;
+            } else  {
                 end = new ChessPosition(this.row, this.col);
                 moves.add(new ChessMove(start, end, null));
             }
@@ -99,18 +96,17 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         }
 
         //check for moving down right
+        System.out.println("Checking down right");
         resetStart();
         while (true){
             this.row -= 1;
             this.col += 1;
-            ChessPosition pos = new ChessPosition(row, col);
-            if (row < 1 ||  col > 7){
-                end = new ChessPosition(this.row+1, this.col-1);
-                if (super.Blocked(Cboard, end, this.piece)) {
-                    break;
-                }
+            end = new ChessPosition(this.row, this.col);
+            if (row < 1 ||  col > 8){
                 break;
-            } else {
+            } else if (super.Blocked(Cboard, end, this.piece)) {
+                break;
+            } else  {
                 end = new ChessPosition(this.row, this.col);
                 moves.add(new ChessMove(start, end, null));
             }
