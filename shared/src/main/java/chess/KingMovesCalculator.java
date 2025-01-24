@@ -4,10 +4,11 @@ import java.util.ArrayList;
 
 public class KingMovesCalculator extends PieceMovesCalculator {
 
+
+    private final ChessBoard Cboard;
     private final ChessPiece piece;
-    private int row;
-    private int col;
-    private ChessBoard Cboard;
+    private final int row;
+    private final int col;
 
     public KingMovesCalculator(ChessBoard board, ChessPosition startPosition, ChessPiece piece) {
         super(board, startPosition, piece);
@@ -16,81 +17,39 @@ public class KingMovesCalculator extends PieceMovesCalculator {
         this.col = startPosition.getColumn();
         this.Cboard = board;
 
-        if (this.piece.getPieceType() != ChessPiece.PieceType.KING) {
-            throw new IllegalArgumentException("KingMovesCalculator can only be used with KING pieces.");
+
+        if (this.piece.getPieceType() != ChessPiece.PieceType.KING){
+            throw new IllegalArgumentException("KingMovesCalculator can only be used with King pieces.");
         }
+
     }
 
-    public void addMove(ChessPosition start, ChessPosition end, ChessPiece piece, ArrayList<ChessMove> moves){
-        if (!super.Blocked(Cboard, end, this.piece)) {
-            moves.add(new ChessMove(start, end, null));
-        } else {
-            System.out.println("BLOCKED");
-        }
-    }
-
-    public ArrayList<ChessMove> calculateMoves() {
+    public ArrayList<ChessMove> calculateMoves(){
         Cboard.printBoard();
 
         ChessPosition start = new ChessPosition(this.row, this.col);
         ChessPosition end;
+
         ArrayList<ChessMove> moves = new ArrayList<>();
+        int[][] directions = {
+                {1, 0}, {1, 1}, {0, 1}, {-1, 1},
+                {-1, 0}, {-1, -1}, {0, -1}, {1, -1}
+        };
 
-        // Check for moving left
-        if (this.col - 1 > 1) {
-            end = new ChessPosition(this.row, this.col - 1);
-            addMove(start, end, piece, moves);
-        }
+       //Check all directions in one for loop
+        for (int[] direction:directions){
+            int newRow = start.getRow() + direction[0];
+            int newCol = start.getColumn() + direction[1];
 
-        // Check for moving up left
-        if (this.col - 1 > 1 && this.row + 1 < 8) {
-            end = new ChessPosition(this.row + 1, this.col - 1);
-            addMove(start, end, piece, moves);
-
-        }
-
-        // Check moves for moving up
-        if (this.row + 1 < 8) {
-            end = new ChessPosition(this.row + 1, this.col);
-            addMove(start, end, piece, moves);
-
-        }
-
-        // Check moves for moving up right
-        if (this.col + 1 < 8 && this.row + 1 < 8) {
-            end = new ChessPosition(this.row + 1, this.col + 1);
-            addMove(start, end, piece, moves);
-
-        }
-
-        // Check for moving right
-        if (this.col + 1 < 8) {
-            end = new ChessPosition(this.row, this.col + 1);
-            addMove(start, end, piece, moves);
-
-        }
-
-        // Check moves for moving down right
-        if (this.col + 1 < 8 && this.row - 1 > 1) {
-            end = new ChessPosition(this.row - 1, this.col + 1);
-            addMove(start, end, piece, moves);
-
-        }
-
-        // Check for moving down
-        if (this.row - 1 > 1) {
-            end = new ChessPosition(this.row - 1, this.col);
-            addMove(start, end, piece, moves);
-
-        }
-
-        // Check moves for moving down left
-        if (this.col - 1 > 1 && this.row - 1 > 1) {
-            end = new ChessPosition(this.row - 1, this.col - 1);
-            addMove(start, end, piece, moves);
-
+            if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
+                end = new ChessPosition(newRow, newCol);
+                if(!Blocked(Cboard,end,piece)) {
+                    moves.add(new ChessMove(start, end, null));
+                }
+            }
         }
 
         return moves;
     }
+
 }
