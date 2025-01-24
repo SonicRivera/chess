@@ -60,33 +60,50 @@ public class ChessPiece {
         return this.type;
     }
 
-    public String getSymbol(){
+    public String getSymbol() {
         if (this.getPieceType() == PieceType.KING) {
-            return "K";
-
+            if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                return "k";
+            } else {
+                return "K";
+            }
         }
         if (this.getPieceType() == PieceType.BISHOP) {
-            return "B";
-
+            if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                return "b";
+            } else {
+                return "B";
+            }
         }
         if (this.getPieceType() == PieceType.KNIGHT) {
-            return "N";
-
+            if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                return "n";
+            } else {
+                return "N";
+            }
         }
         if (this.getPieceType() == PieceType.PAWN) {
-            return "P";
-
+            if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                return "p";
+            } else {
+                return "P";
+            }
         }
         if (this.getPieceType() == PieceType.QUEEN) {
-            return "Q";
-
+            if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                return "q";
+            } else {
+                return "Q";
+            }
         }
         if (this.getPieceType() == PieceType.ROOK) {
-            return "R";
-
+            if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                return "r";
+            } else {
+                return "R";
+            }
         }
-
-        else return null;
+        return null;
     }
 
     /**
@@ -97,7 +114,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-//        BishopMovesCalculator bishop = new BishopMovesCalculator(board, myPosition, PieceType.BISHOP);
+//        BishopMovesCalculator bishop = new BishopMovesCalculator(board, myPosition, board.getPiece(myPosition));
 //        return bishop.calculateMoves();
         KingMovesCalculator King = new KingMovesCalculator(board, myPosition, board.getPiece(myPosition));
         return King.calculateMoves();
