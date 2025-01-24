@@ -30,6 +30,20 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
     public void resetStart(){
         this.row = startPosition.getRow();
         this.col = startPosition.getColumn();
+        this.piece.past = false;
+    }
+
+    @Override
+    public Boolean Blocked(ChessBoard board, ChessPosition endPos, ChessPiece piece){
+        if (board.getPiece(endPos) != null) {
+            if(board.getPiece(endPos).getTeamColor() == piece.getTeamColor()){
+                return true;
+            } else {
+                piece.past = true;
+                return false;
+            }
+        }
+        return piece.past;
     }
 
     public ArrayList<ChessMove> calculateMoves(){
@@ -48,7 +62,7 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
            end = new ChessPosition(this.row, this.col);
            if (row > 8 || col < 1){
                break;
-           } else if (super.Blocked(Cboard, end, this.piece)) {
+           } else if (Blocked(Cboard, end, this.piece)) {
                break;
            } else  {
             end = new ChessPosition(this.row, this.col);
@@ -68,7 +82,7 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
             end = new ChessPosition(this.row, this.col);
             if (row > 8 || col > 8){
                 break;
-            } else if (super.Blocked(Cboard, end, this.piece)) {
+            } else if (Blocked(Cboard, end, this.piece)) {
                 break;
             } else  {
                 end = new ChessPosition(this.row, this.col);
@@ -86,7 +100,7 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
             end = new ChessPosition(this.row, this.col);
             if (row < 1 || col < 1){
                 break;
-            } else if (super.Blocked(Cboard, end, this.piece)) {
+            } else if (Blocked(Cboard, end, this.piece)) {
                 break;
             } else  {
                 end = new ChessPosition(this.row, this.col);
@@ -104,7 +118,7 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
             end = new ChessPosition(this.row, this.col);
             if (row < 1 ||  col > 8){
                 break;
-            } else if (super.Blocked(Cboard, end, this.piece)) {
+            } else if (Blocked(Cboard, end, this.piece)) {
                 break;
             } else  {
                 end = new ChessPosition(this.row, this.col);
