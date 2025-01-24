@@ -114,9 +114,15 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-//        BishopMovesCalculator bishop = new BishopMovesCalculator(board, myPosition, board.getPiece(myPosition));
-//        return bishop.calculateMoves();
+        if (this.getPieceType() == PieceType.BISHOP){
+            BishopMovesCalculator bishop = new BishopMovesCalculator(board, myPosition, this);
+            return bishop.calculateMoves();
+        } else if (this.getPieceType() == PieceType.KING){
+
         KingMovesCalculator King = new KingMovesCalculator(board, myPosition, board.getPiece(myPosition));
         return King.calculateMoves();
+        }
+
+        return new ArrayList<>();
     }
 }
