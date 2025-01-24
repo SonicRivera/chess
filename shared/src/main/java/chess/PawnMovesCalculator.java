@@ -31,71 +31,49 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
     public ArrayList<ChessMove> calculateMoves(){
         Cboard.printBoard();
 
-        ChessPosition start = new ChessPosition(this.row, this.col);
-        ChessPosition end;
-
         ArrayList<ChessMove> moves = new ArrayList<>();
-        int[][] directions = {
-                {1, 0}, {1, 1}, {1, -1}
-        };
 
-        //We may have to set the values manually if each pawn doesn't create it's own instance of calculating moves. ie if white =1, if black =-1;
+        ChessPosition start = new ChessPosition(this.row, this.col);
+        int direction;
+        int startRow;
+        int promotionRow;
 
-        //If this piece is black then check to see if it can double move as well as only move down.
-        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK){
-            this.firstMove = start.getRow() == 7;
-            for (int[] direction: directions) {
-                direction[0] *= -1;
-            }
-            end = new ChessPosition(this.row - 2, this.col);
-
-        } else { //Otherwise, check if white can double move up.
-            this.firstMove = start.getRow() == 2;
-            end = new ChessPosition(this.row + 2, this.col);
-
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+            direction = 1;
+            startRow = 2;
+            promotionRow = 8;
+        } else {
+            direction = -1;
+            startRow = 7;
+            promotionRow = 1;
         }
 
-        //If it is our pawns first move, add the double move if it is not blocked
-        if (firstMove) {
+        ChessPosition end = new ChessPosition(this.row + direction, this.col);
+        if (end.getRow() >= 1 && end.getRow() <= 8 && Cboard.getPiece(end) == null){
+            if (end.getRow() == promotionRow){
+                moves.add(new ChessMove(start, end, ChessPiece.PieceType.QUEEN));
+                moves.add(new ChessMove(start, end, ChessPiece.PieceType.ROOK));
+                moves.add(new ChessMove(start, end, ChessPiece.PieceType.BISHOP));
+                moves.add(new ChessMove(start, end, ChessPiece.PieceType.KNIGHT));
 
-            if (!Blocked(Cboard,end, piece)){
-                moves.add(new ChessMove(start,end, null));
+            } else {
+                moves.add(new ChessMove(start, end, null));
             }
-        }
-
-
-
-        //Check all directions in one for loop
-        for (int i = 0; i < directions.length; i++){
-
-            int newRow = start.getRow() + directions[i][0];
-            int newCol = start.getColumn() + directions[i][1];
-            end = new ChessPosition(newRow, newCol);
-
-            if (i == 0){
-                if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
-                    if(Cboard.getPiece(end) == null) {
-                        moves.add(new ChessMove(start, end, null));
+            if (this.row == startRow){
+                end = new ChessPosition(this.row + 2 * direction, this.col);
+                if(Cboard.getPiece(end) == null) {
+                    if (end.getRow() == promotionRow){
+                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.QUEEN));
+                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.ROOK));
+                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.BISHOP));
+                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.KNIGHT));
+                    } else {
+                        moves.add(new ChessMove(start,end, null));
                     }
                 }
-            } else {
-                if (Cboard.getPiece(end) == null){
-                    continue;
-                }
-                if (Cboard.getPiece(end).getTeamColor() != piece.getTeamColor()){
-                    moves.add(new ChessMove(start, end, null));
-                }
             }
-
-
-
-
-
         }
 
-
-
-       
         return moves;
     }
 
