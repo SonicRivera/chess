@@ -5,13 +5,10 @@ import java.util.ArrayList;
 
 
 public class PieceMovesCalculator {
-    private int row;
-    private int col;
+
     
     public PieceMovesCalculator(ChessBoard board, ChessPosition startPos, ChessPiece piece){
-        this.row = startPos.getRow();
-        this.col = startPos.getColumn();
-        board.getPiece(startPos);
+
     }
 
     /**
