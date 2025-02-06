@@ -57,37 +57,67 @@ public class ChessGame {
         }
 
 
-        Collection<ChessMove> validMoves;
+        Collection<ChessMove> candidateMoves;
+        Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece piece = getBoard().getPiece(startPosition);
-        validMoves = piece.pieceMoves(getBoard(), startPosition);
+        candidateMoves = piece.pieceMoves(getBoard(), startPosition);
 
         //For each move the piece can make, make the move and check for validity
-        for (ChessMove move : validMoves){
+        for (ChessMove move : candidateMoves){
             ChessBoard testBoard = new ChessBoard(this.gameBoard);
             moveTestBoard(testBoard,move);
 
+            //Debug
+            testBoard.printBoard();
+            System.out.println();
+
+
+            ChessGame.TeamColor friendlyKing = getBoard().getPiece(move.getStartPosition()).getTeamColor();
+            ChessPosition kingPos;
+
+            if (friendlyKing == TeamColor.WHITE){
+                kingPos = testBoard.getWhiteKingPos();
+            } else {
+                kingPos = testBoard.getBlackKingPos();
+            }
+
+            boolean safe = true;
+
 
             //Select each piece on the board to test if the current move allows enemy pieces to take the king
-            for (int r = 0; r < 8; r++){
-                for (int c= 0; c < 8; c++){
+            for (int r = 0; r < 8; r++) {
+                for (int c = 0; c < 8; c++) {
+                    ChessPosition pos = new ChessPosition(r + 1, c + 1);
 
-                    //If our currently selected piece is not the piece we're testing for valid moves and is not on the same team
-                    if (testBoard.board[r][c] != piece && testBoard.board[r][c].getTeamColor() != piece.getTeamColor()){
+                    if (testBoard.board[r][c] != null) {
+                        ChessPiece testPiece = testBoard.board[r][c];
 
-                        //For each piece on the board, make the move and check if it's valid. If it's not, reset and try the next move.
+                        // If our currently selected piece is not on the same team
+                        if (testPiece.getTeamColor() != piece.getTeamColor()) {
+                            Collection<ChessMove> otherMoves = testPiece.pieceMoves(testBoard, pos);
 
-                        ChessPosition pos = new ChessPosition(r, c);
-                        if (testBoard.getPiece(pos) != null){
-
-
-                            Collection<ChessMove> otherMoves = testBoard.getPiece(pos).pieceMoves(testBoard, pos);
-
-
-
+                            // If our king is in range of enemy attack, mark the move as unsafe
+                            for (ChessMove otherMove : otherMoves) {
+                                if (otherMove.getEndPosition().equals(kingPos)) {
+                                    safe = false;
+                                    break;
+                                }
+                            }
                         }
+                    }
 
+                    if (!safe) {
+                        break;
                     }
                 }
+
+                if (!safe) {
+                    break;
+                }
+            }
+
+            if (safe) {
+                validMoves.add(move);
             }
         }
 
@@ -112,7 +142,14 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = gameBoard.getPiece(move.getStartPosition());
+
+        if (isValidMove(move, validMoves(move.getStartPosition()))){
+            gameBoard.board[move.getStartPosition().getRow()-1][move.getStartPosition().getColumn()-1] = null;
+            gameBoard.board[move.getEndPosition().getRow()-1][move.getEndPosition().getColumn()-1] = piece;
+        } else {
+            throw new InvalidMoveException();
+        }
 
     }
 
@@ -120,8 +157,8 @@ public class ChessGame {
     public void moveTestBoard(ChessBoard testBoard, ChessMove move){
         ChessPiece piece = testBoard.getPiece(move.getStartPosition());
 
-        testBoard.board[move.getStartPosition().getRow()][move.getStartPosition().getColumn()] = null;
-        testBoard.board[move.getEndPosition().getRow()][move.getEndPosition().getColumn()] = piece;
+        testBoard.board[move.getStartPosition().getRow()-1][move.getStartPosition().getColumn()-1] = null;
+        testBoard.board[move.getEndPosition().getRow()-1][move.getEndPosition().getColumn()-1] = piece;
     }
 
     /**
