@@ -106,6 +106,36 @@ public class ChessBoard {
         }
     }
 
+    public ChessPosition getWhiteKingPos(){
+        for (int r = 1; r <= 8; r++) {
+            for (int c = 1; c <= 8; c++) {
+                ChessPosition pos = new ChessPosition(r, c);
+
+                if (getPiece(pos) != null && getPiece(pos).getPieceType() == ChessPiece.PieceType.KING && getPiece(pos).getTeamColor() == ChessGame.TeamColor.WHITE) {
+
+                    return new ChessPosition(r,c);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public ChessPosition getBlackKingPos(){
+        for (int r = 1; r <= 8; r++) {
+            for (int c = 1; c <= 8; c++) {
+                ChessPosition pos = new ChessPosition(r, c);
+
+                if (getPiece(pos) != null && getPiece(pos).getPieceType() == ChessPiece.PieceType.KING && getPiece(pos).getTeamColor() == ChessGame.TeamColor.BLACK) {
+
+                    return new ChessPosition(r,c);
+                }
+            }
+        }
+
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
