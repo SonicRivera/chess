@@ -25,7 +25,6 @@ public class KnightMovesCalculator extends PieceMovesCalculator {
     }
 
     public ArrayList<ChessMove> calculateMoves(){
-        Cboard.printBoard();
 
         ChessPosition start = new ChessPosition(this.row, this.col);
         ChessPosition end;

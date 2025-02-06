@@ -26,7 +26,6 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
     }
 
     public ArrayList<ChessMove> calculateMoves(){
-        Cboard.printBoard();
 
         ArrayList<ChessMove> moves = new ArrayList<>();
 

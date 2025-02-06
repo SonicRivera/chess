@@ -53,6 +53,8 @@ public class ChessBoard {
      */
     public void resetBoard() {
 
+        board = new ChessPiece[8][8];
+
         for (int i = 0; i < 8; i++) {
             board[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
             board[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
