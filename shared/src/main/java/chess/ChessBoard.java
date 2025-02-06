@@ -12,10 +12,18 @@ import java.util.Objects;
  */
 public class ChessBoard {
 
-    private ChessPiece[][] board = new ChessPiece[8][8];
+    public ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
 
+    }
+
+    public ChessBoard(ChessBoard boardToCopy) {
+        for (int r = 0; r < 8; r++){
+            for (int c = 0; c < 8; c++){
+                this.board[r][c] = boardToCopy.board[r][c];
+            }
+        }
     }
 
     /**
