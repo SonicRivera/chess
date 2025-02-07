@@ -42,7 +42,7 @@ public class KingMovesCalculator extends PieceMovesCalculator {
 
             if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
                 end = new ChessPosition(newRow, newCol);
-                if(!Blocked(Cboard,end,piece)) {
+                if(!isBlocked(Cboard,end,piece)) {
                     moves.add(new ChessMove(start, end, null));
                 }
             }

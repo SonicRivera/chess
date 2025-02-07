@@ -14,7 +14,7 @@ public class PieceMovesCalculator {
     /**
      * Returns true if the piece is blocked.
      */
-    public Boolean Blocked(ChessBoard board, ChessPosition endPos, ChessPiece piece){
+    public Boolean isBlocked(ChessBoard board, ChessPosition endPos, ChessPiece piece){
         if (board.getPiece(endPos) != null) {
             return board.getPiece(endPos).getTeamColor() == piece.getTeamColor();
         }

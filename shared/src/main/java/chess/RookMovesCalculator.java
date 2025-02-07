@@ -25,13 +25,15 @@ public class RookMovesCalculator extends PieceMovesCalculator {
     }
 
     @Override
-    public Boolean Blocked(ChessBoard board, ChessPosition endPos, ChessPiece piece){
-        if (board.getPiece(endPos) != null) {
-            if(board.getPiece(endPos).getTeamColor() == piece.getTeamColor()){
-                return true;
-            } else {
-                piece.past = true;
-                return false;
+    public Boolean isBlocked(ChessBoard board, ChessPosition endPos, ChessPiece piece){
+        if (!piece.past){
+            if (board.getPiece(endPos) != null) {
+                if(board.getPiece(endPos).getTeamColor() == piece.getTeamColor()){
+                    return true;
+                } else {
+                    piece.past = true;
+                    return false;
+                }
             }
         }
         return piece.past;
@@ -63,7 +65,7 @@ public class RookMovesCalculator extends PieceMovesCalculator {
                }
 
                end = new ChessPosition(newRow, newCol);
-               if (Blocked(Cboard,end,piece)) {
+               if (isBlocked(Cboard,end,piece)) {
                     break;
                }
 
