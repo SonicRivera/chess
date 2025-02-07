@@ -186,7 +186,6 @@ public class ChessGame {
             for (int col = 0; col < 8; col++) {
 
                 if (gameBoard.board[row][col] != null && gameBoard.board[row][col].getTeamColor() == teamColor) {
-                    gameBoard.printBoard();
                     Collection<ChessMove> moves = validMoves(new ChessPosition(row + 1, col + 1));
                     if (!moves.isEmpty()) {
                         checkMated = false;
@@ -206,7 +205,25 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)){
+            return false;
+        }
+
+        boolean staleMated = true;
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+
+                if (gameBoard.board[row][col] != null && gameBoard.board[row][col].getTeamColor() == teamColor) {
+                    Collection<ChessMove> moves = validMoves(new ChessPosition(row + 1, col + 1));
+                    if (!moves.isEmpty()) {
+                        staleMated = false;
+                    }
+                }
+            }
+        }
+
+        return staleMated;
     }
 
     /**
