@@ -52,15 +52,15 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         //If there isn't a piece at the given start position then return null
-        if (getBoard().getPiece(startPosition) == null){
+        if (gameBoard.getPiece(startPosition) == null){
             return null;
         }
 
 
         Collection<ChessMove> candidateMoves;
         Collection<ChessMove> validMoves = new ArrayList<>();
-        ChessPiece piece = getBoard().getPiece(startPosition);
-        candidateMoves = piece.pieceMoves(getBoard(), startPosition);
+        ChessPiece piece = gameBoard.getPiece(startPosition);
+        candidateMoves = piece.pieceMoves(gameBoard, startPosition);
 
         //For each move the piece can make, make the move and check for validity
         for (ChessMove move : candidateMoves){
@@ -72,7 +72,7 @@ public class ChessGame {
             System.out.println();
 
 
-            ChessGame.TeamColor friendlyKing = getBoard().getPiece(move.getStartPosition()).getTeamColor();
+            ChessGame.TeamColor friendlyKing = gameBoard.getPiece(move.getStartPosition()).getTeamColor();
             ChessPosition kingPos;
 
             if (friendlyKing == TeamColor.WHITE){
