@@ -51,7 +51,6 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-
         Collection<ChessMove> candidateMoves;
         Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece piece = gameBoard.getPiece(startPosition);
@@ -62,55 +61,36 @@ public class ChessGame {
             return null;
         }
 
-        //For each move the piece can make, make the move and check for validity
-        for (ChessMove move : candidateMoves){
-            ChessBoard testBoard = new ChessBoard(this.gameBoard);
-            moveTestBoard(testBoard,move);
+        //For each move the piece can make, make the move and check if it's valid
+        for (ChessMove move : candidateMoves) {
+            ChessBoard testBoard = new ChessBoard(gameBoard);
+            moveTestBoard(testBoard, move);
+            ChessPosition kingPos = updateKingPos(testBoard, move);
 
-           ChessPosition kingPos = updateKingPos(testBoard,move);
-
-            boolean safe = true;
-
-
-            //Select each piece on the board to test if the current move allows enemy pieces to take the king
-            for (int r = 0; r < 8; r++) {
-                for (int c = 0; c < 8; c++) {
-                    ChessPosition pos = new ChessPosition(r + 1, c + 1);
-
-                    if (testBoard.board[r][c] != null) {
-                        ChessPiece testPiece = testBoard.board[r][c];
-
-                        // If our currently selected piece is not on the same team
-                        if (testPiece.getTeamColor() != piece.getTeamColor()) {
-                            Collection<ChessMove> otherMoves = testPiece.pieceMoves(testBoard, pos);
-
-                            // If our king is in range of enemy attack, mark the move as unsafe
-                            for (ChessMove otherMove : otherMoves) {
-                                if (otherMove.getEndPosition().equals(kingPos)) {
-                                    safe = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (!safe) {
-                        break;
-                    }
-                }
-
-                if (!safe) {
-                    break;
-                }
-            }
-
-            if (safe) {
+            if (isMoveSafe(testBoard, piece.getTeamColor(), kingPos)) {
                 validMoves.add(move);
             }
         }
 
-
         return validMoves;
+    }
+
+    private boolean isMoveSafe(ChessBoard testBoard, TeamColor teamColor, ChessPosition kingPos) {
+        // Select each piece on the board to test if the current move allows enemy pieces to take the king
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                ChessPiece testPiece = testBoard.board[r][c];
+                if (testPiece != null && testPiece.getTeamColor() != teamColor) {
+                    Collection<ChessMove> otherMoves = testPiece.pieceMoves(testBoard, new ChessPosition(r + 1, c + 1));
+                    for (ChessMove otherMove : otherMoves) {
+                        if (otherMove.getEndPosition().equals(kingPos)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     //Returns the current position of friendly king
