@@ -95,14 +95,14 @@ public class ChessGame {
     }
 
     //Returns the current position of friendly king
-    public ChessPosition updateKingPos(ChessBoard testBoard, ChessMove move){
+    public ChessPosition updateKingPos(ChessBoard board, ChessMove move){
         ChessGame.TeamColor friendlyKing = gameBoard.getPiece(move.getStartPosition()).getTeamColor();
         ChessPosition kingPos;
 
         if (friendlyKing == TeamColor.WHITE){
-            kingPos = testBoard.getWhiteKingPos();
+            kingPos = board.getWhiteKingPos();
         } else {
-            kingPos = testBoard.getBlackKingPos();
+            kingPos = board.getBlackKingPos();
         }
         return kingPos;
     }
@@ -112,7 +112,7 @@ public class ChessGame {
             return false;
         }
         for (ChessMove checkMove : validMoves){
-            if (move == checkMove) {
+            if (move.equals(checkMove)) {
                 return true;
             }
 
@@ -129,13 +129,26 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = gameBoard.getPiece(move.getStartPosition());
 
-        if (isValidMove(move, validMoves(move.getStartPosition()))){
-            gameBoard.board[move.getStartPosition().getRow()-1][move.getStartPosition().getColumn()-1] = null;
-            gameBoard.board[move.getEndPosition().getRow()-1][move.getEndPosition().getColumn()-1] = piece;
-        } else {
+        if (piece != null && piece.getTeamColor() == currentTurn){
+            if (isValidMove(move, validMoves(move.getStartPosition()))) {
+                gameBoard.board[move.getStartPosition().getRow() - 1][move.getStartPosition().getColumn() - 1] = null;
+                gameBoard.board[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1] = piece;
+
+                // Handle pawn promotion
+                if (move.getPromotionPiece() != null && piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                    gameBoard.board[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1] = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+                }
+
+                // Switch turns
+                currentTurn = (currentTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+
+            } else {
+                throw new InvalidMoveException();
+            }
+
+        }else {
             throw new InvalidMoveException();
         }
-
     }
 
     //Helper function to execute a move on the test board
