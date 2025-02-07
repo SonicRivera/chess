@@ -51,15 +51,16 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        //If there isn't a piece at the given start position then return null
+        if (gameBoard.getPiece(startPosition) == null){
+            return null;
+        }
+
         Collection<ChessMove> candidateMoves;
         Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece piece = gameBoard.getPiece(startPosition);
         candidateMoves = piece.pieceMoves(gameBoard, startPosition);
 
-        //If there isn't a piece at the given start position then return null
-        if (gameBoard.getPiece(startPosition) == null){
-            return null;
-        }
 
         //For each move the piece can make, make the move and check if it's valid
         for (ChessMove move : candidateMoves) {
@@ -107,6 +108,9 @@ public class ChessGame {
     }
 
     public Boolean isValidMove(ChessMove move, Collection<ChessMove> validMoves){
+        if (validMoves == null){
+            return false;
+        }
         for (ChessMove checkMove : validMoves){
             if (move == checkMove) {
                 return true;
