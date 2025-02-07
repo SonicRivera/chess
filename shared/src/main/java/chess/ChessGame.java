@@ -51,35 +51,23 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        //If there isn't a piece at the given start position then return null
-        if (gameBoard.getPiece(startPosition) == null){
-            return null;
-        }
-
 
         Collection<ChessMove> candidateMoves;
         Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece piece = gameBoard.getPiece(startPosition);
         candidateMoves = piece.pieceMoves(gameBoard, startPosition);
 
+        //If there isn't a piece at the given start position then return null
+        if (gameBoard.getPiece(startPosition) == null){
+            return null;
+        }
+
         //For each move the piece can make, make the move and check for validity
         for (ChessMove move : candidateMoves){
             ChessBoard testBoard = new ChessBoard(this.gameBoard);
             moveTestBoard(testBoard,move);
 
-            //Debug
-            testBoard.printBoard();
-            System.out.println();
-
-
-            ChessGame.TeamColor friendlyKing = gameBoard.getPiece(move.getStartPosition()).getTeamColor();
-            ChessPosition kingPos;
-
-            if (friendlyKing == TeamColor.WHITE){
-                kingPos = testBoard.getWhiteKingPos();
-            } else {
-                kingPos = testBoard.getBlackKingPos();
-            }
+           ChessPosition kingPos = updateKingPos(testBoard,move);
 
             boolean safe = true;
 
@@ -123,6 +111,19 @@ public class ChessGame {
 
 
         return validMoves;
+    }
+
+    //Returns the current position of friendly king
+    public ChessPosition updateKingPos(ChessBoard testBoard, ChessMove move){
+        ChessGame.TeamColor friendlyKing = gameBoard.getPiece(move.getStartPosition()).getTeamColor();
+        ChessPosition kingPos;
+
+        if (friendlyKing == TeamColor.WHITE){
+            kingPos = testBoard.getWhiteKingPos();
+        } else {
+            kingPos = testBoard.getBlackKingPos();
+        }
+        return kingPos;
     }
 
     public Boolean isValidMove(ChessMove move, Collection<ChessMove> validMoves){
