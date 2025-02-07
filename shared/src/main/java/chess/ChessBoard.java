@@ -104,6 +104,7 @@ public class ChessBoard {
             }
             System.out.println();
         }
+        System.out.println();
     }
 
     public ChessPosition getWhiteKingPos(){
