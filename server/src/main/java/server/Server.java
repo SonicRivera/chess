@@ -4,7 +4,6 @@ import spark.*;
 import service.UserService;
 import service.GameService;
 import dataaccess.*;
-import server.UserHandler;
 
 public class Server {
 
