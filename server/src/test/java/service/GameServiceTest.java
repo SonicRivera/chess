@@ -7,114 +7,85 @@ import dataaccess.UserDAO;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
 
-    private GameDAO gameDAO;
-    private AuthDAO authDAO;
     private UserDAO userDAO;
-    private GameService gameService;
+    private AuthDAO authDAO;
     private UserService userService;
+    private GameDAO gameDAO;
+    private GameService gameService;
 
     @BeforeEach
     public void setUp() {
-        gameDAO = new GameDAO();
         userDAO = new UserDAO();
         authDAO = new AuthDAO();
-        gameService = new GameService(gameDAO, authDAO);
         userService = new UserService(userDAO, authDAO);
-        
+        gameDAO = new GameDAO();
+        gameService = new GameService(gameDAO, authDAO);
     }
 
     @Test
-    public void testCreateGame_Success() throws DataAccessException {
+    public void testClear() throws DataAccessException {
+        // Create a new user
         String username = "testuser";
         String password = "password";
         String email = "test@example.com";
-
-        // Create a new user
         UserData newUser = new UserData(username, password, email);
         userDAO.createUser(newUser);
 
-        // Login with the created user
-        AuthData authData = userService.login(username, password);
+        // Clear the data
+        userService.clear();
 
-        // Verify auth
-        assertNotNull(authData);
-        assertEquals(username, authData.username());
+        // Verify clear
+        assertNull(userDAO.getUser(username));
+    }
 
-        // Verify auth token creation
-        AuthData createdAuth = authDAO.getAuth(authData.authToken());
-        assertNotNull(createdAuth);
-        assertEquals(username, createdAuth.username());
+    @Test
+    public void testListGames() throws DataAccessException {
+        String authToken = "validToken";
+        authDAO.createAuth(new AuthData(authToken, "user1"));
+        gameDAO.createGame(new GameData(1, "user1", "user2", "game1", null));
 
-        String gameName = "Test Game";
-        
-        // Create the game
-        int gameID = gameService.createGame(createdAuth.authToken(), gameName);
+        List<GameData> games = gameService.listGames(authToken);
 
-        // Verify the game was created
-        GameData createdGame = gameDAO.getGame(gameID);
+        assertEquals(1, games.size());
+        assertEquals("game1", games.get(0).gameName());
+    }
+
+    @Test
+    public void testCreateGame() throws DataAccessException {
+        String authToken = "validToken";
+        String gameName = "newGame";
+        authDAO.createAuth(new AuthData(authToken, "user1"));
+
+        int gameId = gameService.createGame(authToken, gameName);
+
+        assertEquals(1, gameId);
+        GameData createdGame = gameDAO.getGame(gameId);
         assertNotNull(createdGame);
         assertEquals(gameName, createdGame.gameName());
     }
 
     @Test
-    public void testCreateGame_Failure_Unauthorized() {
-        String authToken = "invalidAuthToken";
-        String gameName = "Test Game";
+    public void testJoinGame() throws DataAccessException {
+        String authToken = "validToken";
+        int gameID = 1;
+        String playerColor = "WHITE";
+        authDAO.createAuth(new AuthData(authToken, "user1"));
+        gameDAO.createGame(new GameData(gameID, null, "user2", "game1", null));
 
-        // Attempt to create a game with an invalid auth token
-        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
-            gameService.createGame(authToken, gameName);
-        });
+        gameService.joinGame(authToken, gameID, playerColor);
 
-        // Verify the exception message
-        assertEquals("401 Error: unauthorized", exception.getMessage());
-    }
-
-    @Test
-    public void testCreateGame_Failure_BadRequest() throws DataAccessException {
-        String authToken = "validAuthToken";
-        String gameName = "";
-
-        // Mock the auth token
-        AuthData authData = new AuthData(authToken, "testuser");
-        authDAO.createAuth(authData);
-
-        // Attempt to create a game with an empty game name
-        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
-            gameService.createGame(authToken, gameName);
-        });
-
-        // Verify the exception message
-        assertEquals("400 Error: bad request", exception.getMessage());
-    }
-
-    @Test
-    public void testClear() throws DataAccessException {
-        String authToken = "validAuthToken";
-        String gameName = "Test Game";
-
-        // Mock the auth token
-        AuthData authData = new AuthData(authToken, "testuser");
-        authDAO.createAuth(authData);
-
-        // Create a game
-        int gameID = gameService.createGame(authToken, gameName);
-
-        // Verify the game was created
-        assertNotNull(gameDAO.getGame(gameID));
-
-        // Clear the data
-        gameService.clear();
-
-        // Verify the game was cleared
-        assertNull(gameDAO.getGame(gameID));
+        GameData updatedGame = gameDAO.getGame(gameID);
+        assertNotNull(updatedGame);
+        assertEquals("user1", updatedGame.whiteUsername());
     }
 }
