@@ -46,6 +46,27 @@ public class GameService {
         return gameDAO.createGame(newGame);
     }
 
+    // Join a game
+    public void joinGame(String authToken, int gameID, String playerColor) throws DataAccessException {
+        AuthData auth = authDAO.getAuth(authToken);
+        if (auth == null) {
+            throw new DataAccessException("401 Error: unauthorized");
+        }
+
+        GameData game = gameDAO.getGame(gameID);
+        if (game == null) {
+            throw new DataAccessException("400 Error: bad request");
+        }
+
+        if ("WHITE".equals(playerColor) && game.whiteUsername() == null) {
+            gameDAO.createGame(new GameData(gameID, auth.username(), game.blackUsername(), game.gameName(), game.game()));
+        } else if ("BLACK".equals(playerColor) && game.blackUsername() == null) {
+            gameDAO.createGame(new GameData(gameID, game.whiteUsername(), auth.username(), game.gameName(), game.game()));
+        } else {
+            throw new DataAccessException("403 Error: already taken");
+        }
+    }
+
     public void clear() {
         gameDAO.clear();
     }
