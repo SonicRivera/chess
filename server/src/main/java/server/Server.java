@@ -41,9 +41,6 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
 
-        UserService userService = new UserService(new UserDAO(), new AuthDAO());
-
-        UserHandler userHandler = new UserHandler(userService);
 
 
         // User Endpoints
