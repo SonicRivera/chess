@@ -95,4 +95,60 @@ public class UserServiceTest {
         // Verify clear
         assertNull(userDAO.getUser(username));
     }
+
+    @Test
+    public void testLoginSuccess() throws DataAccessException {
+        String username = "testuser";
+        String password = "password";
+        String email = "test@example.com";
+
+        // Create a new user
+        UserData newUser = new UserData(username, password, email);
+        userDAO.createUser(newUser);
+
+        // Login with the created user
+        AuthData authData = userService.login(username, password);
+
+        // Verify auth
+        assertNotNull(authData);
+        assertEquals(username, authData.username());
+
+        // Verify auth token creation
+        AuthData createdAuth = authDAO.getAuth(authData.authToken());
+        assertNotNull(createdAuth);
+        assertEquals(username, createdAuth.username());
+    }
+
+    @Test
+    public void testLoginFailureWrongPassword() throws DataAccessException {
+        String username = "testuser";
+        String password = "password";
+        String email = "test@example.com";
+
+        // Create a new user
+        UserData newUser = new UserData(username, password, email);
+        userDAO.createUser(newUser);
+
+        // Attempt to login with wrong password
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
+            userService.login(username, "wrongpassword");
+        });
+
+        assertEquals("401 Error: unauthorized", exception.getMessage());
+    }
+
+    @Test
+    public void testLoginFailureUserNotFound() throws DataAccessException {
+        String username = "nonexistentuser";
+        String password = "password";
+
+        // Attempt to login with a non-existent user
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
+            userService.login(username, password);
+        });
+
+        assertEquals("401 Error: unauthorized", exception.getMessage());
+    }
+
+
 }

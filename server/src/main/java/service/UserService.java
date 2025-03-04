@@ -37,6 +37,20 @@ public class UserService {
         return authData;
     }
 
+    // Login an existing user
+    public AuthData login(String username, String password) throws DataAccessException {
+        UserData user = userDAO.getUser(username);
+        if (user == null || !user.password().equals(password)) {
+            throw new DataAccessException("401 Error: unauthorized");
+        }
+
+        String authToken = UUID.randomUUID().toString();
+        AuthData authData = new AuthData(authToken, username);
+        authDAO.createAuth(authData);
+
+        return authData;
+    }
+
 
     public void clear() {
         userDAO.clear();

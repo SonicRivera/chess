@@ -39,12 +39,25 @@ public class UserHandler {
         }
     };
 
-
-
-
     // Login Handler
     public Route login = (Request req, Response res) -> {
-        return "{}";
+        JsonObject body = JsonUtil.fromJson(req.body(), JsonObject.class);
+        String username = body.get("username").getAsString();
+        String password = body.get("password").getAsString();
+
+        try {
+            AuthData authData = userService.login(username, password);
+            res.status(200);
+            return JsonUtil.toJson(authData);
+        } catch (DataAccessException e) {
+            String message = e.getMessage();
+            if (message.startsWith("401")) {
+                res.status(401);
+            } else {
+                res.status(500);
+            }
+            return JsonUtil.toJson(new ErrorResponse(message.substring(4)));
+        }
     };
 
     // Logout Handler
