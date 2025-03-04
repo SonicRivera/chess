@@ -20,6 +20,11 @@ public class Server {
 
     public Server() {
 
+
+    }
+
+    public int run(int desiredPort) {
+
         userDAO = new UserDAO();
         authDAO = new AuthDAO();
         gameDAO = new GameDAO();
@@ -29,9 +34,7 @@ public class Server {
 
         userHandler = new UserHandler(userService);
         gameHandler = new GameHandler(gameService);
-    }
 
-    public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");

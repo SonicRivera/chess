@@ -11,11 +11,22 @@ public class GameDAO {
     // Create a new game
     public int createGame(GameData game) {
         int gameID = nextGameID++;
+
         games.put(gameID, new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game()));
         return gameID;
     }
 
-    // Clear
+    // Retrieve a game by ID
+    public GameData getGame(int gameID) {
+        return games.get(gameID);
+    }
+
+    // List all games
+    public Map<Integer, GameData> listGames() {
+        return games;
+    }
+
+    // Clear all games
     public void clear() {
         games.clear();
         nextGameID = 1;

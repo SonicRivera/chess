@@ -1,7 +1,9 @@
 package server;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
+import model.UserData;
 import service.UserService;
 import model.AuthData;
 import spark.Request;
@@ -17,13 +19,11 @@ public class UserHandler {
 
     // Register Handler
     public Route register = (Request req, Response res) -> {
-        JsonObject body = JsonUtil.fromJson(req.body(), JsonObject.class);
-        String username = body.has("username") ? body.get("username").getAsString() : null;
-        String password = body.has("password") ? body.get("password").getAsString() : null;
-        String email = body.has("email") ? body.get("email").getAsString() : null;
+
+        UserData userData = new Gson().fromJson(req.body(), UserData.class);
 
         try {
-            AuthData authData = userService.register(username, password, email);
+            AuthData authData = userService.register(userData.username(), userData.password(), userData.email());
             res.status(200);
             return JsonUtil.toJson(authData);
         } catch (DataAccessException e) {
@@ -41,14 +41,15 @@ public class UserHandler {
 
     // Login Handler
     public Route login = (Request req, Response res) -> {
-        JsonObject body = JsonUtil.fromJson(req.body(), JsonObject.class);
-        String username = body.get("username").getAsString();
-        String password = body.get("password").getAsString();
+        UserData userData = new Gson().fromJson(req.body(), UserData.class);
+        String username = userData.username();
+        String password = userData.password();
 
         try {
             AuthData authData = userService.login(username, password);
             res.status(200);
-            return JsonUtil.toJson(authData);
+
+            return new Gson().toJson(authData);
         } catch (DataAccessException e) {
             String message = e.getMessage();
             if (message.startsWith("401")) {
@@ -56,7 +57,7 @@ public class UserHandler {
             } else {
                 res.status(500);
             }
-            return JsonUtil.toJson(new ErrorResponse(message.substring(4)));
+            return new Gson().toJson(new ErrorResponse(message.substring(4)));
         }
     };
 

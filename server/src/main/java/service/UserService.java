@@ -1,13 +1,12 @@
 package service;
 
+import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
-import dataaccess.AuthDAO;
-import model.UserData;
 import model.AuthData;
+import model.UserData;
 
 import java.util.UUID;
-
 
 public class UserService {
     private final UserDAO userDAO;
@@ -32,6 +31,7 @@ public class UserService {
 
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, username);
+
         authDAO.createAuth(authData);
         return authData;
     }
@@ -58,10 +58,8 @@ public class UserService {
         authDAO.deleteAuth(authToken);
     }
 
-
     public void clear() {
         userDAO.clear();
         authDAO.clear();
     }
-
 }

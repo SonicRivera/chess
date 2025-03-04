@@ -1,31 +1,67 @@
 package server;
 
+import com.google.gson.JsonObject;
+import dataaccess.DataAccessException;
 import service.GameService;
 import model.GameData;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
+import java.util.List;
+
 public class GameHandler {
-    private final GameService gameService;
+    GameService gameService;
 
     public GameHandler(GameService gameService) {
         this.gameService = gameService;
     }
 
-    // List Games
+    // List Games Handler
     public Route listGames = (Request req, Response res) -> {
-        return "{}";
+        String authToken = req.headers("authorization");
+
+        try {
+            List<GameData> games = gameService.listGames(authToken);
+            res.status(200);
+            return JsonUtil.toJson(games);
+        } catch (DataAccessException e) {
+            res.status(401);
+            return JsonUtil.toJson(new ErrorResponse(e.getMessage()));
+        }
     };
 
-    // Create Game
+    // Create Game Handler
     public Route createGame = (Request req, Response res) -> {
-        return "{}";
+        String authToken = req.headers("authorization"); // Extract authToken
+
+        JsonObject body = JsonUtil.fromJson(req.body(), JsonObject.class);
+        String gameName = body.has("gameName") ? body.get("gameName").getAsString() : null;
+
+
+        try {
+            int gameID = gameService.createGame(authToken, gameName);
+            res.status(200);
+            return JsonUtil.toJson(new GameIDResponse(gameID));
+        } catch (DataAccessException e) {
+            String message = e.getMessage();
+            if (message.startsWith("400")) {
+                res.status(400);
+            } else if (message.startsWith("401")) {
+                res.status(401);
+            } else {
+                res.status(500);
+            }
+            return JsonUtil.toJson(new ErrorResponse(message.substring(4))); // Remove error code prefix
+        }
     };
 
     // Join Game
     public Route joinGame = (Request req, Response res) -> {
         return "{}";
     };
+
+    private record GameIDResponse(int gameID) {}
+    private record ErrorResponse(String message) {}
 
 }
