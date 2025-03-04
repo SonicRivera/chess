@@ -62,7 +62,21 @@ public class UserHandler {
 
     // Logout Handler
     public Route logout = (Request req, Response res) -> {
-        return "{}";
+        String authToken = req.headers("authorization");
+
+        try {
+            userService.logout(authToken);
+            res.status(200);
+            return "{}";
+        } catch (DataAccessException e) {
+            String message = e.getMessage();
+            if (message.startsWith("401")) {
+                res.status(401);
+            } else {
+                res.status(500);
+            }
+            return JsonUtil.toJson(new ErrorResponse(message.substring(4)));
+        }
     };
 
     // Error Response

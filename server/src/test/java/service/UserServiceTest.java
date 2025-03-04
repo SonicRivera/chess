@@ -150,5 +150,37 @@ public class UserServiceTest {
         assertEquals("401 Error: unauthorized", exception.getMessage());
     }
 
+    @Test
+    public void testLogoutSuccess() throws DataAccessException {
+        String username = "testuser";
+        String password = "password";
+        String email = "test@example.com";
+
+        // Create a new user
+        UserData newUser = new UserData(username, password, email);
+        userDAO.createUser(newUser);
+
+        // Login with the created user
+        AuthData authData = userService.login(username, password);
+
+        // Logout the user
+        userService.logout(authData.authToken());
+
+        // Verify the auth token is deleted
+        assertNull(authDAO.getAuth(authData.authToken()));
+    }
+
+    @Test
+    public void testLogoutFailureInvalidToken() {
+        String invalidAuthToken = "invalidToken";
+
+        // Attempt to logout with an invalid token
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> {
+            userService.logout(invalidAuthToken);
+        });
+
+        assertEquals("401 Error: unauthorized", exception.getMessage());
+    }
+
 
 }
