@@ -29,7 +29,8 @@ public class GameDAO {
     // Update an existing game
     public void updateGame(int gameID, GameData updatedGame) {
         if (games.containsKey(gameID)) {
-            games.put(gameID, new GameData(gameID, updatedGame.whiteUsername(), updatedGame.blackUsername(), updatedGame.gameName(), updatedGame.game()));
+            GameData newGameInfo = new GameData(gameID, updatedGame.whiteUsername(), updatedGame.blackUsername(), updatedGame.gameName(), updatedGame.game());
+            games.put(gameID, newGameInfo);
             
         }
         
