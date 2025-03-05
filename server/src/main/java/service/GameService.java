@@ -1,5 +1,7 @@
 package service;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.AuthDAO;
@@ -8,22 +10,41 @@ import model.AuthData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import com.google.gson.JsonObject;
 
 public class GameService {
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
+    private final Gson gson = new Gson();
 
     public GameService(GameDAO gameDAO, AuthDAO authDAO) {
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
     }
 
-    // List all games
-    public List<GameData> listGames(String authToken) throws DataAccessException {
+        // List all games
+    public String listGames(String authToken) throws DataAccessException {
         if (authDAO.getAuth(authToken) == null) {
             throw new DataAccessException("401 Error: unauthorized");
         }
-        return new ArrayList<>(gameDAO.listGames().values());
+        List<GameData> gamesList = new ArrayList<>(gameDAO.listGames().values());
+
+        JsonArray gamesArray = new JsonArray();
+        for (GameData game : gamesList) {
+            JsonObject gameObject = new JsonObject();
+            gameObject.addProperty("gameID", game.gameID());
+            gameObject.addProperty("whiteUsername", game.whiteUsername());
+            gameObject.addProperty("blackUsername", game.blackUsername());
+            gameObject.addProperty("gameName", game.gameName());
+            gamesArray.add(gameObject);
+        }
+
+        JsonObject result = new JsonObject();
+        result.add("games", gamesArray);
+
+        return gson.toJson(result);
     }
 
     // Create a new game
@@ -58,10 +79,12 @@ public class GameService {
             throw new DataAccessException("400 Error: bad request");
         }
 
-        if ("WHITE".equals(playerColor) && game.whiteUsername() == null) {
-            gameDAO.createGame(new GameData(gameID, auth.username(), game.blackUsername(), game.gameName(), game.game()));
+        if (!Objects.equals(playerColor, "WHITE") && !Objects.equals(playerColor, "BLACK")){
+            throw new DataAccessException("400 Error: bad request");
+        } else if ("WHITE".equals(playerColor) && game.whiteUsername() == null) {
+            gameDAO.updateGame(gameID, new GameData(gameID, auth.username(), game.blackUsername(), game.gameName(), game.game()));
         } else if ("BLACK".equals(playerColor) && game.blackUsername() == null) {
-            gameDAO.createGame(new GameData(gameID, game.whiteUsername(), auth.username(), game.gameName(), game.game()));
+            gameDAO.updateGame(gameID, new GameData(gameID, game.whiteUsername(), auth.username(), game.gameName(), game.game()));
         } else {
             throw new DataAccessException("403 Error: already taken");
         }
