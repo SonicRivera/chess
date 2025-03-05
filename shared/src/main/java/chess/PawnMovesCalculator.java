@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class PawnMovesCalculator extends PieceMovesCalculator {
 
@@ -25,8 +27,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
 
     }
 
-    public ArrayList<ChessMove> calculateMoves(){
-
+    public ArrayList<ChessMove> calculateMoves() {
         ArrayList<ChessMove> moves = new ArrayList<>();
 
         ChessPosition start = new ChessPosition(this.row, this.col);
@@ -34,7 +35,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         int startRow;
         int promotionRow;
 
-        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
             direction = 1;
             startRow = 2;
             promotionRow = 8;
@@ -45,27 +46,13 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         }
 
         ChessPosition end = new ChessPosition(this.row + direction, this.col);
-        if (end.getRow() >= 1 && end.getRow() <= 8 && cBoard.getPiece(end) == null){
-            if (end.getRow() == promotionRow){
-                moves.add(new ChessMove(start, end, ChessPiece.PieceType.QUEEN));
-                moves.add(new ChessMove(start, end, ChessPiece.PieceType.ROOK));
-                moves.add(new ChessMove(start, end, ChessPiece.PieceType.BISHOP));
-                moves.add(new ChessMove(start, end, ChessPiece.PieceType.KNIGHT));
+        if (end.getRow() >= 1 && end.getRow() <= 8 && cBoard.getPiece(end) == null) {
+            addMove(moves, start, end, end.getRow() == promotionRow);
 
-            } else {
-                moves.add(new ChessMove(start, end, null));
-            }
-            if (this.row == startRow){
+            if (this.row == startRow) {
                 end = new ChessPosition(this.row + 2 * direction, this.col);
-                if(cBoard.getPiece(end) == null) {
-                    if (end.getRow() == promotionRow){
-                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.QUEEN));
-                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.ROOK));
-                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.BISHOP));
-                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.KNIGHT));
-                    } else {
-                        moves.add(new ChessMove(start,end, null));
-                    }
+                if (cBoard.getPiece(end) == null) {
+                    addMove(moves, start, end, end.getRow() == promotionRow);
                 }
             }
         }
@@ -76,18 +63,20 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
             if (end.getRow() >= 1 && end.getRow() <= 8 && end.getColumn() >= 1 && end.getColumn() <= 8) {
                 ChessPiece targetPiece = cBoard.getPiece(end);
                 if (targetPiece != null && targetPiece.getTeamColor() != piece.getTeamColor()) {
-                    if (end.getRow() == promotionRow){
-                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.QUEEN));
-                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.ROOK));
-                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.BISHOP));
-                        moves.add(new ChessMove(start, end, ChessPiece.PieceType.KNIGHT));
-                    } else {
-                    moves.add(new ChessMove(start, end, null));
-                    }
+                    addMove(moves, start, end, end.getRow() == promotionRow);
                 }
             }
         }
+
         return moves;
     }
 
+    private void addMove(List<ChessMove> moves, ChessPosition start, ChessPosition end, boolean isPromotion) {
+        if (isPromotion) {
+            Arrays.asList(ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.ROOK, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT)
+                  .forEach(promotionPiece -> moves.add(new ChessMove(start, end, promotionPiece)));
+        } else {
+            moves.add(new ChessMove(start, end, null));
+        }
+    }
 }
