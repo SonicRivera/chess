@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class RookMovesCalculator extends PieceMovesCalculator {
 
 
-    private final ChessBoard Cboard;
+    private final ChessBoard cBoard;
     private final ChessPiece piece;
     private final int row;
     private final int col;
@@ -15,7 +15,7 @@ public class RookMovesCalculator extends PieceMovesCalculator {
         this.piece = piece;
         this.row = startPosition.getRow();
         this.col = startPosition.getColumn();
-        this.Cboard = board;
+        this.cBoard = board;
 
 
         if (this.piece.getPieceType() != ChessPiece.PieceType.ROOK){
@@ -65,7 +65,7 @@ public class RookMovesCalculator extends PieceMovesCalculator {
                }
 
                end = new ChessPosition(newRow, newCol);
-               if (isBlocked(Cboard,end,piece)) {
+               if (isBlocked(cBoard,end,piece)) {
                     break;
                }
 

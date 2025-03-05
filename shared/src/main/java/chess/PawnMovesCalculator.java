@@ -8,14 +8,14 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
     private final ChessPiece piece;
     private final int row;
     private final int col;
-    private final ChessBoard Cboard;
+    private final ChessBoard cBoard;
 
     public PawnMovesCalculator(ChessBoard board, ChessPosition startPosition, ChessPiece piece) {
         super(board, startPosition, piece);
         this.piece = piece;
         this.row = startPosition.getRow();
         this.col = startPosition.getColumn();
-        this.Cboard = board;
+        this.cBoard = board;
 
 
 
@@ -45,7 +45,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         }
 
         ChessPosition end = new ChessPosition(this.row + direction, this.col);
-        if (end.getRow() >= 1 && end.getRow() <= 8 && Cboard.getPiece(end) == null){
+        if (end.getRow() >= 1 && end.getRow() <= 8 && cBoard.getPiece(end) == null){
             if (end.getRow() == promotionRow){
                 moves.add(new ChessMove(start, end, ChessPiece.PieceType.QUEEN));
                 moves.add(new ChessMove(start, end, ChessPiece.PieceType.ROOK));
@@ -57,7 +57,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
             }
             if (this.row == startRow){
                 end = new ChessPosition(this.row + 2 * direction, this.col);
-                if(Cboard.getPiece(end) == null) {
+                if(cBoard.getPiece(end) == null) {
                     if (end.getRow() == promotionRow){
                         moves.add(new ChessMove(start, end, ChessPiece.PieceType.QUEEN));
                         moves.add(new ChessMove(start, end, ChessPiece.PieceType.ROOK));
@@ -74,7 +74,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator {
         for (int[] captureDirection : captureDirections) {
             end = new ChessPosition(this.row + captureDirection[0], this.col + captureDirection[1]);
             if (end.getRow() >= 1 && end.getRow() <= 8 && end.getColumn() >= 1 && end.getColumn() <= 8) {
-                ChessPiece targetPiece = Cboard.getPiece(end);
+                ChessPiece targetPiece = cBoard.getPiece(end);
                 if (targetPiece != null && targetPiece.getTeamColor() != piece.getTeamColor()) {
                     if (end.getRow() == promotionRow){
                         moves.add(new ChessMove(start, end, ChessPiece.PieceType.QUEEN));

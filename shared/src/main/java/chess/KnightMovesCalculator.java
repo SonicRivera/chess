@@ -8,14 +8,14 @@ public class KnightMovesCalculator extends PieceMovesCalculator {
     private final ChessPiece piece;
     private final int row;
     private final int col;
-    private final ChessBoard Cboard;
+    private final ChessBoard cBoard;
 
     public KnightMovesCalculator(ChessBoard board, ChessPosition startPosition, ChessPiece piece) {
         super(board, startPosition, piece);
         this.piece = piece;
         this.row = startPosition.getRow();
         this.col = startPosition.getColumn();
-        this.Cboard = board;
+        this.cBoard = board;
 
 
         if (this.piece.getPieceType() != ChessPiece.PieceType.KNIGHT){
@@ -42,7 +42,7 @@ public class KnightMovesCalculator extends PieceMovesCalculator {
 
            if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
                end = new ChessPosition(newRow, newCol);
-               if(!isBlocked(Cboard,end,piece)) {
+               if(!isBlocked(cBoard,end,piece)) {
                     moves.add(new ChessMove(start, end, null));
                }
            }

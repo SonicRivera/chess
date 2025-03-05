@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class KingMovesCalculator extends PieceMovesCalculator {
 
 
-    private final ChessBoard Cboard;
+    private final ChessBoard cBoard;
     private final ChessPiece piece;
     private final int row;
     private final int col;
@@ -15,7 +15,7 @@ public class KingMovesCalculator extends PieceMovesCalculator {
         this.piece = piece;
         this.row = startPosition.getRow();
         this.col = startPosition.getColumn();
-        this.Cboard = board;
+        this.cBoard = board;
 
 
         if (this.piece.getPieceType() != ChessPiece.PieceType.KING){
@@ -42,7 +42,7 @@ public class KingMovesCalculator extends PieceMovesCalculator {
 
             if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
                 end = new ChessPosition(newRow, newCol);
-                if(!isBlocked(Cboard,end,piece)) {
+                if(!isBlocked(cBoard,end,piece)) {
                     moves.add(new ChessMove(start, end, null));
                 }
             }

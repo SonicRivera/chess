@@ -117,33 +117,33 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         if (this.getPieceType() == PieceType.BISHOP){
-            BishopMovesCalculator Bishop = new BishopMovesCalculator(board, myPosition, this);
-            return Bishop.calculateMoves();
+            BishopMovesCalculator bishop = new BishopMovesCalculator(board, myPosition, this);
+            return bishop.calculateMoves();
 
         } else if (this.getPieceType() == PieceType.KING) {
 
-            KingMovesCalculator King = new KingMovesCalculator(board, myPosition, board.getPiece(myPosition));
-            return King.calculateMoves();
+            KingMovesCalculator king = new KingMovesCalculator(board, myPosition, board.getPiece(myPosition));
+            return king.calculateMoves();
 
         } else if (this.getPieceType() == PieceType.KNIGHT){
 
-            KnightMovesCalculator Knight = new KnightMovesCalculator(board,myPosition, board.getPiece(myPosition));
-            return Knight.calculateMoves();
+            KnightMovesCalculator knight = new KnightMovesCalculator(board,myPosition, board.getPiece(myPosition));
+            return knight.calculateMoves();
 
         } else if (this.getPieceType() == PieceType.PAWN){
 
-            PawnMovesCalculator Pawn = new PawnMovesCalculator(board,myPosition, board.getPiece(myPosition));
-            return Pawn.calculateMoves();
+            PawnMovesCalculator pawn = new PawnMovesCalculator(board,myPosition, board.getPiece(myPosition));
+            return pawn.calculateMoves();
 
         } else if (this.getPieceType() == PieceType.QUEEN){
 
-            QueenMovesCalculator Queen = new QueenMovesCalculator(board,myPosition, board.getPiece(myPosition));
-            return Queen.calculateMoves();
+            QueenMovesCalculator queen = new QueenMovesCalculator(board,myPosition, board.getPiece(myPosition));
+            return queen.calculateMoves();
 
         } else if (this.getPieceType() == PieceType.ROOK){
 
-            RookMovesCalculator Rook = new RookMovesCalculator(board,myPosition, board.getPiece(myPosition));
-            return Rook.calculateMoves();
+            RookMovesCalculator rook = new RookMovesCalculator(board,myPosition, board.getPiece(myPosition));
+            return rook.calculateMoves();
 
         }
 
