@@ -70,4 +70,27 @@ public class PieceMovesCalculator {
         return moves;
     }
 
+    public ArrayList<ChessMove> calculateLimitedMoves(int[][] directions, int row, int col, ChessPiece piece, ChessBoard cBoard){
+
+        ChessPosition start = new ChessPosition(row, col);
+        ChessPosition end;
+
+        ArrayList<ChessMove> moves = new ArrayList<>();
+
+        //Check all directions in one for loop
+        for (int[] direction:directions){
+            int newRow = start.getRow() + direction[0];
+            int newCol = start.getColumn() + direction[1];
+
+            if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
+                end = new ChessPosition(newRow, newCol);
+                if(!isBlocked(cBoard,end,piece)) {
+                    moves.add(new ChessMove(start, end, null));
+                }
+            }
+        }
+
+        return moves;
+    }
+
 }
