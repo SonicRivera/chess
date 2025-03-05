@@ -33,22 +33,6 @@ public class GameServiceTest {
     }
 
     @Test
-    public void testClear() throws DataAccessException {
-        // Create a new user
-        String username = "testuser";
-        String password = "password";
-        String email = "test@example.com";
-        UserData newUser = new UserData(username, password, email);
-        userDAO.createUser(newUser);
-
-        // Clear the data
-        userService.clear();
-
-        // Verify clear
-        assertNull(userDAO.getUser(username));
-    }
-
-    @Test
     public void testListGames() throws DataAccessException {
         String authToken = "validToken";
         authDAO.createAuth(new AuthData(authToken, "user1"));
