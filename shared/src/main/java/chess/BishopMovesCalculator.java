@@ -24,56 +24,11 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
 
     }
 
-    @Override
-    public Boolean isBlocked(ChessBoard board, ChessPosition endPos, ChessPiece piece){
-        if (!piece.past){
-            if (board.getPiece(endPos) != null) {
-                if(board.getPiece(endPos).getTeamColor() == piece.getTeamColor()){
-                    return true;
-                } else {
-                    piece.past = true;
-                    return false;
-                }
-            }
-        }
-        return piece.past;
-    }
-
     public ArrayList<ChessMove> calculateMoves(){
-
-        ChessPosition start = new ChessPosition(this.row, this.col);
-        ChessPosition end;
-
-        ArrayList<ChessMove> moves = new ArrayList<>();
         int[][] directions = {
                 {1, 1}, {-1, 1}, {-1, -1}, {1, -1}
         };
-
-       //Check all directions in one for loop
-       for (int[] direction:directions){
-           int newRow = start.getRow();
-           int newCol = start.getColumn();
-           piece.past = false;
-
-           while (true){
-               newRow += direction[0];
-               newCol += direction[1];
-
-               if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
-                    break;
-               }
-
-               end = new ChessPosition(newRow, newCol);
-               if (isBlocked(cBoard,end,piece)) {
-                    break;
-               }
-
-               moves.add(new ChessMove(start, end, null));
-           }
-
-       }
-
-        return moves;
+        return super.calculateMoves(directions, this.row, this.col, piece, cBoard);
     }
 
 }

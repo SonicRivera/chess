@@ -35,8 +35,39 @@ public class PieceMovesCalculator {
         return piece.past;
     }
 
-    public ArrayList<ChessMove> calculateMoves(){
-        return new ArrayList<>();
+    public ArrayList<ChessMove> calculateMoves(int[][] directions, int row, int col, ChessPiece piece, ChessBoard cBoard){
+
+        ChessPosition start = new ChessPosition(row, col);
+        ChessPosition end;
+
+        ArrayList<ChessMove> moves = new ArrayList<>();
+
+
+        //Check all directions in one for loop
+        for (int[] direction:directions){
+            int newRow = start.getRow();
+            int newCol = start.getColumn();
+            piece.past = false;
+
+            while (true){
+                newRow += direction[0];
+                newCol += direction[1];
+
+                if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+                    break;
+                }
+
+                end = new ChessPosition(newRow, newCol);
+                if (isSpecialBlocked(cBoard,end,piece)) {
+                    break;
+                }
+
+                moves.add(new ChessMove(start, end, null));
+            }
+
+        }
+
+        return moves;
     }
 
 }
