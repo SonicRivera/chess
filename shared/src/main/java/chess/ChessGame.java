@@ -81,12 +81,13 @@ public class ChessGame {
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 ChessPiece testPiece = testBoard.board[r][c];
-                if (testPiece != null && testPiece.getTeamColor() != teamColor) {
-                    Collection<ChessMove> otherMoves = testPiece.pieceMoves(testBoard, new ChessPosition(r + 1, c + 1));
-                    for (ChessMove otherMove : otherMoves) {
-                        if (otherMove.getEndPosition().equals(kingPos)) {
-                            return false;
-                        }
+                if (testPiece == null || testPiece.getTeamColor() == teamColor) {
+                    continue;
+                }
+                Collection<ChessMove> otherMoves = testPiece.pieceMoves(testBoard, new ChessPosition(r + 1, c + 1));
+                for (ChessMove otherMove : otherMoves) {
+                    if (otherMove.getEndPosition().equals(kingPos)) {
+                        return false;
                     }
                 }
             }
@@ -136,7 +137,8 @@ public class ChessGame {
 
                 // Handle pawn promotion
                 if (move.getPromotionPiece() != null && piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-                    gameBoard.board[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1] = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+                    ChessPiece promotedPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+                    gameBoard.board[move.getEndPosition().getRow() - 1][move.getEndPosition().getColumn() - 1] = promotedPiece;
                 }
 
                 // Switch turns

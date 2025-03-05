@@ -113,8 +113,10 @@ public class ChessBoard {
         for (int r = 1; r <= 8; r++) {
             for (int c = 1; c <= 8; c++) {
                 ChessPosition pos = new ChessPosition(r, c);
+                ChessPiece piece = getPiece(pos);
 
-                if (getPiece(pos) != null && getPiece(pos).getPieceType() == ChessPiece.PieceType.KING && getPiece(pos).getTeamColor() == ChessGame.TeamColor.WHITE) {
+
+                if (getPiece(pos) != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
 
                     return new ChessPosition(r,c);
                 }
@@ -128,8 +130,9 @@ public class ChessBoard {
         for (int r = 1; r <= 8; r++) {
             for (int c = 1; c <= 8; c++) {
                 ChessPosition pos = new ChessPosition(r, c);
+                ChessPiece piece = getPiece(pos);
 
-                if (getPiece(pos) != null && getPiece(pos).getPieceType() == ChessPiece.PieceType.KING && getPiece(pos).getTeamColor() == ChessGame.TeamColor.BLACK) {
+                if (getPiece(pos) != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
 
                     return new ChessPosition(r,c);
                 }

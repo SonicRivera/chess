@@ -21,6 +21,20 @@ public class PieceMovesCalculator {
         return false;
     }
 
+    public Boolean isSpecialBlocked(ChessBoard board, ChessPosition endPos, ChessPiece piece){
+        if (!piece.past){
+            if (board.getPiece(endPos) != null) {
+                if(board.getPiece(endPos).getTeamColor() == piece.getTeamColor()){
+                    return true;
+                } else {
+                    piece.past = true;
+                    return false;
+                }
+            }
+        }
+        return piece.past;
+    }
+
     public ArrayList<ChessMove> calculateMoves(){
         return new ArrayList<>();
     }
