@@ -18,8 +18,6 @@ public class Server {
     GameHandler gameHandler;
 
     public Server() {
-
-
     }
 
     public int run(int desiredPort) {
@@ -39,8 +37,6 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-
-
 
         // User Endpoints
         Spark.delete("/db", this::clear);
@@ -65,14 +61,10 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private Object clear(Request req, Response resp) {
-
+    private Object clear(Request req, Response resp) throws DataAccessException {
         userService.clear();
         gameService.clear();
-
         resp.status(200);
         return "{}";
     }
-
-
 }
