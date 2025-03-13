@@ -1,41 +1,68 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
+import jdk.jshell.spi.ExecutionControl;
 import model.GameData;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GameDAO {
-    private final Map<Integer, GameData> games = new HashMap<>();
-    private int nextGameID = 1;
 
-    // Create a new game
-    public int createGame(GameData game) {
-        int gameID = nextGameID++;
+    public GameDAO() {
 
-        games.put(gameID, new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game()));
-        return gameID;
-    }
+        try {
+            DatabaseManager.createDatabase();
+            DatabaseManager.createTables();
 
-    // Retrieve a game by ID
-    public GameData getGame(int gameID) {
-        return games.get(gameID);
-    }
-
-    // List all games
-    public Map<Integer, GameData> listGames() {
-        return games;
-    }
-
-    // Update an existing game
-    public void updateGame(int gameID, GameData updatedGame) {
-        if (games.containsKey(gameID)) {
-            games.put(gameID, updatedGame);
+        } catch (DataAccessException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
-    // Clear all games
-    public void clear() {
-        games.clear();
-        nextGameID = 1;
+    public int createGame(GameData game) throws DataAccessException {
+        String sql = "INSERT INTO games (white_username, black_username, game_name, game_state) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, game.whiteUsername());
+            stmt.setString(2, game.blackUsername());
+            stmt.setString(3, game.gameName());
+            stmt.setString(4, serializeGame(game.game()));
+            stmt.executeUpdate();
+
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error creating game: " + e.getMessage());
+        }
+        return -1;
+    }
+
+    public GameData getGame(int gameID) throws ExecutionControl.NotImplementedException {
+        throw new ExecutionControl.NotImplementedException("Not implemented");
+    }
+
+    public Map<Integer, GameData> listGames() throws ExecutionControl.NotImplementedException {
+        throw new ExecutionControl.NotImplementedException("Not implemented");
+    }
+
+    public void updateGame(GameData game) throws ExecutionControl.NotImplementedException {
+        throw new ExecutionControl.NotImplementedException("Not implemented");
+    }
+
+    public void clear() throws ExecutionControl.NotImplementedException {
+        throw new ExecutionControl.NotImplementedException("Not implemented");
+    }
+
+
+    private String serializeGame(ChessGame game) {
+        return new Gson().toJson(game);
     }
 }
