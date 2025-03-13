@@ -8,6 +8,8 @@ import model.UserData;
 
 import java.util.UUID;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class UserService {
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
@@ -39,7 +41,7 @@ public class UserService {
     // Login an existing user
     public AuthData login(String username, String password) throws DataAccessException {
         UserData user = userDAO.getUser(username);
-        if (user == null || !user.password().equals(password)) {
+        if (user == null || !BCrypt.checkpw(password, user.password())) {
             throw new DataAccessException("401 Error: unauthorized");
         }
 
@@ -58,7 +60,7 @@ public class UserService {
         authDAO.deleteAuth(authToken);
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         userDAO.clear();
         authDAO.clear();
     }
