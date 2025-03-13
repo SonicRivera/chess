@@ -81,8 +81,14 @@ public class GameDAO {
         throw new ExecutionControl.NotImplementedException("Not implemented");
     }
 
-    public void clear() throws ExecutionControl.NotImplementedException {
-        throw new ExecutionControl.NotImplementedException("Not implemented");
+    public void clear() throws DataAccessException {
+        String sql = "DELETE FROM games";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Error clearing games: " + e.getMessage());
+        }
     }
 
 
