@@ -20,6 +20,9 @@ public class AuthDAO {
     }
 
     public void createAuth(AuthData auth) throws DataAccessException {
+        if (auth == null) {
+            throw new DataAccessException("AuthData cannot be null");
+        }
         String sql = "INSERT INTO auth_tokens (auth_token, username) VALUES (?, ?)";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -32,6 +35,9 @@ public class AuthDAO {
     }
 
     public AuthData getAuth(String authToken) throws DataAccessException {
+        if (authToken == null) {
+            throw new DataAccessException("Auth token cannot be null");
+        }
         String sql = "SELECT auth_token, username FROM auth_tokens WHERE auth_token = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -52,7 +58,10 @@ public class AuthDAO {
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, authToken);
-            stmt.executeUpdate();
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new DataAccessException("Auth token not found: " + authToken);
+            }
         } catch (SQLException e) {
             throw new DataAccessException("Error deleting auth token: " + e.getMessage());
         }

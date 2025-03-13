@@ -30,9 +30,23 @@ public class AuthDAOTest {
     }
 
     @Test
+    public void testCreateAuthFailureNullAuthData() {
+        assertThrows(DataAccessException.class, () -> {
+            authDAO.createAuth(null);
+        });
+    }
+
+    @Test
     public void testGetAuthNotFound() throws DataAccessException {
         AuthData retrievedAuth = authDAO.getAuth("nonexistentToken");
         assertNull(retrievedAuth);
+    }
+
+    @Test
+    public void testGetAuthFailureNullAuthToken() {
+        assertThrows(DataAccessException.class, () -> {
+            authDAO.getAuth(null);
+        });
     }
 
     @Test
@@ -44,6 +58,13 @@ public class AuthDAOTest {
 
         AuthData retrievedAuth = authDAO.getAuth("authToken1");
         assertNull(retrievedAuth);
+    }
+
+    @Test
+    public void testDeleteAuthFailure_NonexistentAuthToken() {
+        assertThrows(DataAccessException.class, () -> {
+            authDAO.deleteAuth("nonexistentToken");
+        });
     }
 
     @Test
