@@ -61,8 +61,20 @@ public class GameDAO {
         return null;
     }
 
-    public Map<Integer, GameData> listGames() throws ExecutionControl.NotImplementedException {
-        throw new ExecutionControl.NotImplementedException("Not implemented");
+    public Map<Integer, GameData> listGames() throws DataAccessException {
+        String sql = "SELECT game_id, white_username, black_username, game_name, game_state FROM games";
+        Map<Integer, GameData> games = new HashMap<>();
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                GameData game = new GameData(rs.getInt("game_id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("game_name"), deserializeGame(rs.getString("game_state")));
+                games.put(game.gameID(), game);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error listing games: " + e.getMessage());
+        }
+        return games;
     }
 
     public void updateGame(GameData game) throws ExecutionControl.NotImplementedException {
