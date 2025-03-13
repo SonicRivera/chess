@@ -32,6 +32,29 @@ public class UserDAOTest {
     }
 
     @Test
+    public void testCreateUserFailureDuplicateUsername() throws DataAccessException {
+        UserData user1 = new UserData("username1", "password1", "email1@example.com");
+        userDAO.createUser(user1);
+
+        UserData user2 = new UserData("username1", "password2", "email2@example.com");
+        assertThrows(DataAccessException.class, () -> {
+            userDAO.createUser(user2);
+        });
+    }
+
+    @Test
+    public void testGetUserSuccess() throws DataAccessException {
+        UserData user = new UserData("username1", "password1", "email1@example.com");
+        userDAO.createUser(user);
+
+        UserData retrievedUser = userDAO.getUser("username1");
+        assertNotNull(retrievedUser);
+        assertEquals("username1", retrievedUser.username());
+        assertTrue(BCrypt.checkpw("password1", retrievedUser.password()));
+        assertEquals("email1@example.com", retrievedUser.email());
+    }
+
+    @Test
     public void testGetUserNotFound() throws DataAccessException {
         UserData retrievedUser = userDAO.getUser("nonexistentUser");
         assertNull(retrievedUser);
