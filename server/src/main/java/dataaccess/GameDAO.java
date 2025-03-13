@@ -25,6 +25,9 @@ public class GameDAO {
     }
 
     public int createGame(GameData game) throws DataAccessException {
+        if (game == null) {
+            throw new DataAccessException("Game data cannot be null");
+        }
         String sql = "INSERT INTO games (white_username, black_username, game_name, game_state) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -46,6 +49,9 @@ public class GameDAO {
     }
 
     public GameData getGame(int gameID) throws DataAccessException {
+        if (gameID <= 0) {
+            throw new DataAccessException("Invalid gameID");
+        }
         String sql = "SELECT game_id, white_username, black_username, game_name, game_state FROM games WHERE game_id = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -80,6 +86,9 @@ public class GameDAO {
     }
 
     public void updateGame(GameData game) throws DataAccessException {
+        if (getGame(game.gameID()) == null){
+            throw new DataAccessException("Invalid GameID");
+        }
         String sql = "UPDATE games SET white_username = ?, black_username = ?, game_name = ?, game_state = ? WHERE game_id = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
