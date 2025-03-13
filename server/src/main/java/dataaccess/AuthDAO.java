@@ -67,4 +67,15 @@ public class AuthDAO {
             throw new DataAccessException("Error clearing auth tokens: " + e.getMessage());
         }
     }
+
+    public void kill() throws DataAccessException{
+        String sql = "DROP DATABASE IF EXISTS chessdb";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Error killing database : " + e.getMessage());
+        }
+
+    }
 }

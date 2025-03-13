@@ -21,8 +21,12 @@ public class GameServiceTest {
 
     @BeforeEach
     public void setUp() throws DataAccessException {
+
+
         authDAO = new AuthDAO();
+        authDAO.kill();
         gameDAO = new GameDAO();
+        authDAO = new AuthDAO();
         gameService = new GameService(gameDAO, authDAO);
         gameDAO.clear();
         authDAO.clear();

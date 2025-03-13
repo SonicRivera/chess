@@ -1,9 +1,8 @@
-package dbtests;
+package dataaccess;
 
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import dataaccess.*;
 
 import java.sql.SQLException;
 

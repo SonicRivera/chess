@@ -1,6 +1,5 @@
-package dbtests;
+package dataaccess;
 
-import dataaccess.*;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
