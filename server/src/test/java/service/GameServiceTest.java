@@ -6,10 +6,8 @@ import com.google.gson.JsonParser;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
-import dataaccess.UserDAO;
 import model.AuthData;
 import model.GameData;
-import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,19 +15,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
 
-    private UserDAO userDAO;
     private AuthDAO authDAO;
-    private UserService userService;
     private GameDAO gameDAO;
     private GameService gameService;
 
     @BeforeEach
-    public void setUp() {
-        userDAO = new UserDAO();
+    public void setUp() throws DataAccessException {
         authDAO = new AuthDAO();
-        userService = new UserService(userDAO, authDAO);
         gameDAO = new GameDAO();
         gameService = new GameService(gameDAO, authDAO);
+        gameDAO.clear();
+        authDAO.clear();
     }
 
     @Test
