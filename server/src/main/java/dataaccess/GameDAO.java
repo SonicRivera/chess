@@ -77,8 +77,19 @@ public class GameDAO {
         return games;
     }
 
-    public void updateGame(GameData game) throws ExecutionControl.NotImplementedException {
-        throw new ExecutionControl.NotImplementedException("Not implemented");
+    public void updateGame(GameData game) throws DataAccessException {
+        String sql = "UPDATE games SET white_username = ?, black_username = ?, game_name = ?, game_state = ? WHERE game_id = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, game.whiteUsername());
+            stmt.setString(2, game.blackUsername());
+            stmt.setString(3, game.gameName());
+            stmt.setString(4, serializeGame(game.game()));
+            stmt.setInt(5, game.gameID());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Error updating game: " + e.getMessage());
+        }
     }
 
     public void clear() throws DataAccessException {
