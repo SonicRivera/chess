@@ -82,15 +82,17 @@ public class GameService {
         if (!Objects.equals(playerColor, "WHITE") && !Objects.equals(playerColor, "BLACK")){
             throw new DataAccessException("400 Error: bad request");
         } else if ("WHITE".equals(playerColor) && game.whiteUsername() == null) {
-            gameDAO.updateGame(gameID, new GameData(gameID, auth.username(), game.blackUsername(), game.gameName(), game.game()));
+            GameData newData = new GameData(gameID, auth.username(), game.blackUsername(), game.gameName(), game.game());
+            gameDAO.updateGame(newData);
         } else if ("BLACK".equals(playerColor) && game.blackUsername() == null) {
-            gameDAO.updateGame(gameID, new GameData(gameID, game.whiteUsername(), auth.username(), game.gameName(), game.game()));
+            GameData newData = new GameData(gameID, game.whiteUsername(), auth.username(), game.gameName(), game.game());
+            gameDAO.updateGame(newData);
         } else {
             throw new DataAccessException("403 Error: already taken");
         }
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         gameDAO.clear();
     }
 }
