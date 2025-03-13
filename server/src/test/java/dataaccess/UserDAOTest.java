@@ -47,11 +47,7 @@ public class UserDAOTest {
         UserData user = new UserData("username1", "password1", "email1@example.com");
         userDAO.createUser(user);
 
-        UserData retrievedUser = userDAO.getUser("username1");
-        assertNotNull(retrievedUser);
-        assertEquals("username1", retrievedUser.username());
-        assertTrue(BCrypt.checkpw("password1", retrievedUser.password()));
-        assertEquals("email1@example.com", retrievedUser.email());
+        verifyUser(user, "password1");
     }
 
     @Test
@@ -71,5 +67,13 @@ public class UserDAOTest {
 
         assertNull(userDAO.getUser("username1"));
         assertNull(userDAO.getUser("username2"));
+    }
+
+    private void verifyUser(UserData user, String password) throws DataAccessException {
+        UserData retrievedUser = userDAO.getUser(user.username());
+        assertNotNull(retrievedUser);
+        assertEquals(user.username(), retrievedUser.username());
+        assertTrue(BCrypt.checkpw(password, retrievedUser.password()));
+        assertEquals(user.email(), retrievedUser.email());
     }
 }

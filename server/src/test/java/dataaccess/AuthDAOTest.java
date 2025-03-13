@@ -44,12 +44,12 @@ public class AuthDAOTest {
 
     @Test
     public void testGetAuthSuccess() throws DataAccessException {
-        AuthData authData = new AuthData("aslkfaslkjhadslkjhagdssdf", "SonicRivera");
+        AuthData authData = new AuthData("authToken1", "SonicRivera");
         authDAO.createAuth(authData);
 
         AuthData retrievedAuth = authDAO.getAuth("authToken1");
         assertNotNull(retrievedAuth);
-        assertEquals("aslkfaslkjhadslkjhagdssdf", retrievedAuth.authToken());
+        assertEquals("authToken1", retrievedAuth.authToken());
         assertEquals("SonicRivera", retrievedAuth.username());
     }
 
