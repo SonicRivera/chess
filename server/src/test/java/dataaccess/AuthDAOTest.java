@@ -44,13 +44,13 @@ public class AuthDAOTest {
 
     @Test
     public void testGetAuthSuccess() throws DataAccessException {
-        AuthData authData = new AuthData("authToken1", "username1");
+        AuthData authData = new AuthData("aslkfaslkjhadslkjhagdssdf", "SonicRivera");
         authDAO.createAuth(authData);
 
         AuthData retrievedAuth = authDAO.getAuth("authToken1");
         assertNotNull(retrievedAuth);
-        assertEquals("authToken1", retrievedAuth.authToken());
-        assertEquals("username1", retrievedAuth.username());
+        assertEquals("aslkfaslkjhadslkjhagdssdf", retrievedAuth.authToken());
+        assertEquals("SonicRivera", retrievedAuth.username());
     }
 
     @Test
@@ -72,7 +72,7 @@ public class AuthDAOTest {
     }
 
     @Test
-    public void testDeleteAuthFailure_NonexistentAuthToken() {
+    public void testDeleteAuthFailureNonexistentAuthToken() {
         assertThrows(DataAccessException.class, () -> {
             authDAO.deleteAuth("nonexistentToken");
         });
