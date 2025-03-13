@@ -20,7 +20,7 @@ public class GameDAOTest {
     }
 
     @Test
-    public void testCreateGame_Success() throws DataAccessException {
+    public void testCreateGameSuccess() throws DataAccessException {
         GameData game = new GameData(0, "whitePlayer", "blackPlayer", "Test Game", new ChessGame());
         int gameID = gameDAO.createGame(game);
 
@@ -34,13 +34,13 @@ public class GameDAOTest {
     }
 
     @Test
-    public void testGetGame_NotFound() throws DataAccessException {
+    public void testGetGameNotFound() throws DataAccessException {
         GameData retrievedGame = gameDAO.getGame(999);
         assertNull(retrievedGame);
     }
 
     @Test
-    public void testUpdateGame_Success() throws DataAccessException {
+    public void testUpdateGameSuccess() throws DataAccessException {
         GameData game = new GameData(0, "whitePlayer", "blackPlayer", "Test Game", new ChessGame());
         int gameID = gameDAO.createGame(game);
 
@@ -57,7 +57,7 @@ public class GameDAOTest {
     }
 
     @Test
-    public void testClear_Success() throws DataAccessException {
+    public void testClearSuccess() throws DataAccessException {
         GameData game1 = new GameData(0, "whitePlayer1", "blackPlayer1", "Test Game 1", new ChessGame());
         GameData game2 = new GameData(0, "whitePlayer2", "blackPlayer2", "Test Game 2", new ChessGame());
         gameDAO.createGame(game1);

@@ -21,7 +21,7 @@ public class UserDAOTest {
     }
 
     @Test
-    public void testCreateUser_Success() throws DataAccessException {
+    public void testCreateUserSuccess() throws DataAccessException {
         UserData user = new UserData("username1", "password1", "email1@example.com");
         userDAO.createUser(user);
 
@@ -33,13 +33,13 @@ public class UserDAOTest {
     }
 
     @Test
-    public void testGetUser_NotFound() throws DataAccessException {
+    public void testGetUserNotFound() throws DataAccessException {
         UserData retrievedUser = userDAO.getUser("nonexistentUser");
         assertNull(retrievedUser);
     }
 
     @Test
-    public void testClear_Success() throws DataAccessException {
+    public void testClearSuccess() throws DataAccessException {
         UserData user1 = new UserData("username1", "password1", "email1@example.com");
         UserData user2 = new UserData("username2", "password2", "email2@example.com");
         userDAO.createUser(user1);

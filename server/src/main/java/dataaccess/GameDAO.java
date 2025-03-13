@@ -52,7 +52,8 @@ public class GameDAO {
             stmt.setInt(1, gameID);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new GameData(rs.getInt("game_id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("game_name"), deserializeGame(rs.getString("game_state")));
+                    return new GameData(rs.getInt("game_id"), rs.getString("white_username"), rs.getString("black_username"),
+                            rs.getString("game_name"), deserializeGame(rs.getString("game_state")));
                 }
             }
         } catch (SQLException e) {
@@ -68,7 +69,8 @@ public class GameDAO {
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                GameData game = new GameData(rs.getInt("game_id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("game_name"), deserializeGame(rs.getString("game_state")));
+                GameData game = new GameData(rs.getInt("game_id"), rs.getString("white_username"), rs.getString("black_username"),
+                        rs.getString("game_name"), deserializeGame(rs.getString("game_state")));
                 games.put(game.gameID(), game);
             }
         } catch (SQLException e) {
