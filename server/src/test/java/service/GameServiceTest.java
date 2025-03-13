@@ -126,7 +126,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void testJoinGameBadRequest() {
+    public void testJoinGameBadRequest() throws DataAccessException {
         String authToken = "validToken";
         int invalidGameID = 999;
         String playerColor = "WHITE";
