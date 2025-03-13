@@ -45,8 +45,20 @@ public class GameDAO {
         return -1;
     }
 
-    public GameData getGame(int gameID) throws ExecutionControl.NotImplementedException {
-        throw new ExecutionControl.NotImplementedException("Not implemented");
+    public GameData getGame(int gameID) throws DataAccessException {
+        String sql = "SELECT game_id, white_username, black_username, game_name, game_state FROM games WHERE game_id = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, gameID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new GameData(rs.getInt("game_id"), rs.getString("white_username"), rs.getString("black_username"), rs.getString("game_name"), deserializeGame(rs.getString("game_state")));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error retrieving game: " + e.getMessage());
+        }
+        return null;
     }
 
     public Map<Integer, GameData> listGames() throws ExecutionControl.NotImplementedException {
@@ -64,5 +76,9 @@ public class GameDAO {
 
     private String serializeGame(ChessGame game) {
         return new Gson().toJson(game);
+    }
+
+    private ChessGame deserializeGame(String serializedGame) {
+        return new Gson().fromJson(serializedGame, ChessGame.class);
     }
 }
