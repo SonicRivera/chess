@@ -236,7 +236,6 @@ public class Main {
                 }
             } else if (command.equalsIgnoreCase("Quit") || command.equalsIgnoreCase("Q")) {
                 Logout();
-                break;
             }
 
             // Unknown Command Handling
@@ -247,7 +246,25 @@ public class Main {
     }
 
     private static void Logout() {
-
+        try {
+            String url = "http://localhost:832/session";
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("DELETE");
+    
+            // Read the response
+            int responseCode = connection.getResponseCode();
+            if (responseCode == 200) {
+                System.out.println("Logout successful!");
+            } else {
+                try (InputStream is = connection.getErrorStream()) {
+                    String error = new String(is.readAllBytes());
+                    JsonObject json = JsonParser.parseString(error).getAsJsonObject();
+                    System.out.println("Error during logout: " + json.get("message").getAsString());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error during logout: " + e.getMessage());
+        }
     }
 
 
