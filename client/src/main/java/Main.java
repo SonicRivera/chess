@@ -68,7 +68,6 @@ public class Main {
                     String[] loginInfo = new String[2];
                     System.arraycopy(info, 1, loginInfo, 0, 2);
                     Login(loginInfo);
-                    break; // REMOVE THIS ONCE IMPLEMENTED
                 }
             }
 
@@ -124,10 +123,41 @@ public class Main {
 }
 
     private static void Login(String[] info) {
-        for (String word : info) {
-            System.out.println(word);
+        try {
+            String url = "http://localhost:832/session";
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // Create JSON payload
+            String payload = String.format("{\"username\":\"%s\",\"password\":\"%s\"}",
+                    info[0], info[1]);
+
+            // Send the request
+            try (OutputStream os = connection.getOutputStream()) {
+                os.write(payload.getBytes());
+                os.flush();
+            }
+
+            // Read the response
+            int responseCode = connection.getResponseCode();
+            if (responseCode == 200) {
+                System.out.println("Login successful!");
+                PostLogin();
+                System.exit(0); // There might be a better way to do this...
+
+            } else {
+                try (InputStream is = connection.getErrorStream()) {
+                    String error = new String(is.readAllBytes());
+                    JsonObject json = JsonParser.parseString(error).getAsJsonObject();
+                    System.out.println(json.get("message").getAsString());
+                }
+
+            }
+        } catch (Exception e) {
+            System.out.println("Error during login: " + e.getMessage());
         }
-        PostLogin();
     }
 
 
