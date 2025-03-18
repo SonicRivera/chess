@@ -1,14 +1,21 @@
 import chess.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import server.Server;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.*;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("♕ Welcome to Chess. Type \"Help\" for options. ♕");
+        Server server = new Server();
+        server.run(832);
         PreLogin();
-//        Server server = new Server();
-//        server.run(832);
+        System.exit(0);
     }
 
     private static void PreLogin() {
@@ -45,7 +52,6 @@ public class Main {
                     String[] registerInfo = new String[3];
                     System.arraycopy(info, 1, registerInfo, 0, 3);
                     Register(registerInfo);
-                    break;
                 }
             }
 
@@ -60,7 +66,7 @@ public class Main {
                     String[] loginInfo = new String[2];
                     System.arraycopy(info, 1, loginInfo, 0, 2);
                     Login(loginInfo);
-                    break;
+                    break; // REMOVE THIS ONCE IMPLEMENTED
                 }
             }
 
@@ -77,11 +83,38 @@ public class Main {
     }
 
     private static void Register(String[] info) {
-        for (String word : info) {
-            System.out.println(word);
+    try {
+        String url = "http://localhost:832/user";
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setDoOutput(true);
+
+        // Create JSON payload
+        String payload = String.format("{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\"}",
+                info[0], info[1], info[2]);
+
+        // Send the request
+        try (OutputStream os = connection.getOutputStream()) {
+            os.write(payload.getBytes());
+            os.flush();
         }
-        PostLogin();
+
+        // Read the response
+        int responseCode = connection.getResponseCode();
+        if (responseCode == 200) {
+            System.out.println("Registration successful!");
+        } else {
+            try (InputStream is = connection.getErrorStream()) {
+                String error = new String(is.readAllBytes());
+                JsonObject json = JsonParser.parseString(error).getAsJsonObject();
+                System.out.println(json.get("message").getAsString());
+            }
+        }
+    } catch (Exception e) {
+        System.out.println("Error during registration: " + e.getMessage());
     }
+}
 
     private static void Login(String[] info) {
         for (String word : info) {
