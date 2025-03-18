@@ -18,6 +18,8 @@ public class Main {
         System.exit(0);
     }
 
+    // This should be in it's own class
+
     private static void PreLogin() {
         // Coloring
         final String RESET = "\u001B[0m";
@@ -104,6 +106,11 @@ public class Main {
         int responseCode = connection.getResponseCode();
         if (responseCode == 200) {
             System.out.println("Registration successful!");
+            String[] loginInfo = new String[2];
+            System.arraycopy(info, 0, loginInfo, 0, 2);
+            Login(loginInfo);
+            System.exit(0); // There might be a better way to do this...
+
         } else {
             try (InputStream is = connection.getErrorStream()) {
                 String error = new String(is.readAllBytes());
@@ -122,6 +129,9 @@ public class Main {
         }
         PostLogin();
     }
+
+
+    // Everything below here should be in it's own class
 
     private static void PostLogin() {
         // Coloring
@@ -156,7 +166,7 @@ public class Main {
             // Logout
             else if (baseCommand.equals("logout")) {
                 System.out.println(YELLOW + "Logging out..." + RESET);
-                PreLogin();
+                Logout();
                 break;
             }
 
@@ -194,9 +204,8 @@ public class Main {
                 } else {
                     observeGame(observeArgs[0]);
                 }
-            }
-
-            else if (command.equalsIgnoreCase("Quit") || command.equalsIgnoreCase("Q")){
+            } else if (command.equalsIgnoreCase("Quit") || command.equalsIgnoreCase("Q")) {
+                Logout();
                 break;
             }
 
@@ -205,6 +214,10 @@ public class Main {
                 System.out.println(RED + "Unknown command. Type 'help' for a list of commands." + RESET);
             }
         }
+    }
+
+    private static void Logout() {
+
     }
 
 
