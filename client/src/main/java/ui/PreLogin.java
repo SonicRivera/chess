@@ -29,7 +29,7 @@ public class PreLogin {
 
 
         Scanner scanner = new Scanner(System.in);
-        String command = "";
+        String command;
         String prefix = RED + "[Logged Out] " + RESET + " >>> ";
 
         while (!loggedIn) {
@@ -68,8 +68,12 @@ public class PreLogin {
                 } else {
                     String[] loginInfo = new String[2];
                     System.arraycopy(info, 1, loginInfo, 0, 2);
-                    Login(loginInfo);
-                    break;
+                    if (Login(loginInfo)){
+                        PostLogin postlogin = new PostLogin(sessionToken);
+                        postlogin.run();
+                        loggedIn = true;
+                    }
+
                 }
             }
 
@@ -81,12 +85,7 @@ public class PreLogin {
             else {
                 System.out.println(RED + "Unknown command. Type 'help' for a list of commands." + RESET);
             }
-
         }
-
-        PostLogin postlogin = new PostLogin(sessionToken);
-        postlogin.run();
-
 
 
     }
@@ -132,7 +131,7 @@ public class PreLogin {
     }
 
 
-    private static void Login(String[] info) {
+    private static boolean Login(String[] info) {
         try {
             String url = "http://localhost:832/session";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -161,6 +160,7 @@ public class PreLogin {
                     String response = new String(is.readAllBytes());
                     JsonObject json = JsonParser.parseString(response).getAsJsonObject();
                     sessionToken = json.get("authToken").getAsString(); // Store the token
+                    return true;
                 }
 
 
@@ -169,12 +169,15 @@ public class PreLogin {
                     String error = new String(is.readAllBytes());
                     JsonObject json = JsonParser.parseString(error).getAsJsonObject();
                     System.out.println(json.get("message").getAsString());
+                    return false;
                 }
 
             }
         } catch (Exception e) {
             System.out.println("Error during login: " + e.getMessage());
         }
+
+        return false;
     }
 
 }

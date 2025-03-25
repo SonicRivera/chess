@@ -56,7 +56,7 @@ https://sequencediagram.org/index.html?presentationMode=readOnly#initialData=IYY
 )
 
 ## TODO
-- [ ] Logout
+- [x] Logout
 - [ ] Create Game
 - [ ] List Games
 - [ ] Play Game
