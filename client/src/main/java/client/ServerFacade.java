@@ -2,7 +2,7 @@ package client;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import ui.Repl;
+import ui.EscapeSequences;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,7 +17,7 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public static void Register(String[] info) {
+    public static boolean Register(String[] info) {
         try {
             String url = serverUrl + "/user";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -42,6 +42,7 @@ public class ServerFacade {
                 String[] loginInfo = new String[2];
                 System.arraycopy(info, 0, loginInfo, 0, 2);
                 Login(loginInfo);
+                return true;
 
             } else {
                 try (InputStream is = connection.getErrorStream()) {
@@ -53,12 +54,14 @@ public class ServerFacade {
         } catch (Exception e) {
             System.out.println("Error during registration: " + e.getMessage());
         }
+
+        return false;
     }
 
 
-    public static boolean Login(String[] info) {
+    public static String Login(String[] info) {
         try {
-            String url = "http://localhost:832/session";
+            String url = serverUrl + "/session";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -78,14 +81,12 @@ public class ServerFacade {
             int responseCode = connection.getResponseCode();
             if (responseCode == 200) {
                 System.out.println("Login successful!");
-                loggedIn = true;
 
                 // Try getting the authToken from response
                 try (InputStream is = connection.getInputStream()) {
                     String response = new String(is.readAllBytes());
                     JsonObject json = JsonParser.parseString(response).getAsJsonObject();
-                    sessionToken = json.get("authToken").getAsString(); // Store the token
-                    return true;
+                    return json.get("authToken").getAsString(); // Return the session token
                 }
 
 
@@ -94,7 +95,7 @@ public class ServerFacade {
                     String error = new String(is.readAllBytes());
                     JsonObject json = JsonParser.parseString(error).getAsJsonObject();
                     System.out.println(json.get("message").getAsString());
-                    return false;
+                    return "";
                 }
 
             }
@@ -102,19 +103,19 @@ public class ServerFacade {
             System.out.println("Error during login: " + e.getMessage());
         }
 
-        return false;
+        return "";
     }
 
-    public static void Logout(boolean quit) {
+    public static boolean Logout(String sessionToken) {
         try {
             if (sessionToken == null) {
-                System.out.println(RED + "No session token, please log in.");
-                return;
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "No session token, please log in.");
+                return false;
             }
 
 
 
-            String url = "http://localhost:832/session";
+            String url = serverUrl + "/session";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("DELETE");
             connection.setRequestProperty("Authorization", sessionToken); // Include the token
@@ -123,13 +124,7 @@ public class ServerFacade {
             int responseCode = connection.getResponseCode();
             if (responseCode == 200) {
                 System.out.println("Logout successful!");
-                sessionToken = null;
-                Repl preLogin = new Repl();
-                loggedIn = false;
-                if (quit){
-                    return;
-                }
-                preLogin.run();
+                return true;
 
             } else {
                 try (InputStream is = connection.getErrorStream()) {
@@ -141,6 +136,8 @@ public class ServerFacade {
         } catch (Exception e) {
             System.out.println("Error during logout: " + e.getMessage());
         }
+
+        return false;
     }
 
 

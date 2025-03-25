@@ -6,22 +6,28 @@ public class Repl {
 
     private final ChessClient client;
 
-    // Colors
-    private String RED = EscapeSequences.SET_TEXT_COLOR_RED;
-    private String RESET = EscapeSequences.RESET_TEXT_COLOR;
-
     public Repl(String serverUrl){
-        client = new ChessClient(serverUrl, this);
+        client = new ChessClient(serverUrl);
     }
 
     public void run() {
+
+        // Colors
+        String RED = EscapeSequences.SET_TEXT_COLOR_RED;
+        String RESET = EscapeSequences.RESET_TEXT_COLOR;
+
         Scanner scanner = new Scanner(System.in);
         String command = "";
-        String prefix = RED + "[Logged Out] " + RESET + " >>> ";
-
+        String prefix;
 
 
         while (!command.equalsIgnoreCase("Quit") && !command.equalsIgnoreCase("Q")) {
+
+            if (client.state == State.SIGNEDOUT){
+                prefix = RED + "[Logged Out] " + RESET + " >>> ";
+            } else {
+                prefix = RED + "[Logged In] " + RESET + " >>> ";
+            }
             System.out.print(prefix);
             command = scanner.nextLine();
 
@@ -30,10 +36,6 @@ public class Repl {
             if (command.equalsIgnoreCase("Quit") || command.equalsIgnoreCase("Q")){
                 return;
             }
-
         }
-
-
     }
-
 }
