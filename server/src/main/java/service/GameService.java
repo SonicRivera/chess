@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import chess.ChessGame;
+
 import com.google.gson.JsonObject;
 
 public class GameService {
@@ -63,7 +65,7 @@ public class GameService {
             throw new DataAccessException("400: Error: bad request");
         }
 
-        GameData newGame = new GameData(0, null, null, gameName, null);
+        GameData newGame = new GameData(0, null, null, gameName, new ChessGame());
         return gameDAO.createGame(newGame);
     }
 
