@@ -6,26 +6,23 @@ import client.ServerFacade;
 public class ChessClient {
 
     private final ServerFacade server;
-    private final String serverUrl;
-    private final Repl repl;
-    private State state = State.SIGNEDOUT;
+    public State state = State.SIGNEDOUT;
     private String sessionToken = null;
 
 
 
-    // Colors
-    private String RED = EscapeSequences.SET_TEXT_COLOR_RED;
-    private String BLUE = EscapeSequences.SET_TEXT_COLOR_BLUE;
-    private String YELLOW = EscapeSequences.SET_TEXT_COLOR_YELLOW;
-    private String RESET = EscapeSequences.RESET_TEXT_COLOR;
 
-    public ChessClient(String serverUrl, Repl repl){
+    public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
-        this.serverUrl = serverUrl;
-        this.repl = repl;
     }
 
     public void eval(String command){
+
+        // Colors
+        String RED = EscapeSequences.SET_TEXT_COLOR_RED;
+        String BLUE = EscapeSequences.SET_TEXT_COLOR_BLUE;
+        String YELLOW = EscapeSequences.SET_TEXT_COLOR_YELLOW;
+        String RESET = EscapeSequences.RESET_TEXT_COLOR;
 
         // Separate the base command and the arguments
         String[] parts = command.split("\\s+", 2);
@@ -50,7 +47,9 @@ public class ChessClient {
                 } else if (regArgs.length > 3) {
                     System.out.println(RED + "Please only input a username, password, and an email.");
                 } else {
-                    server.Register(regArgs);
+                    if (server.Register(regArgs)) {
+                        state = State.SIGNEDIN;
+                    }
                 }
             }
 
@@ -62,7 +61,8 @@ public class ChessClient {
                 } else if (loginArgs.length > 2) {
                     System.out.println(RED + "Please only input a username and password.");
                 } else {
-                    if (server.Login(loginArgs)){
+                    sessionToken = server.Login(loginArgs);
+                    if (!sessionToken.isEmpty()){
                         state = state.SIGNEDIN;
                     }
 
@@ -83,7 +83,11 @@ public class ChessClient {
             // Logout
             else if (baseCommand.equals("logout")) {
                 System.out.println(YELLOW + "Logging out..." + RESET);
-                server.Logout(false);
+                if(server.Logout(sessionToken)){
+                    sessionToken = null;
+                    state = State.SIGNEDOUT;
+                }
+
             }
 
             // Create
@@ -120,13 +124,17 @@ public class ChessClient {
                 } else {
                     server.observeGame(observeArgs[0]);
                 }
-            } else if (command.equalsIgnoreCase("Quit") || command.equalsIgnoreCase("Q")) {
-                server.Logout(true);
-                return;
             }
 
         }
 
+        else if (baseCommand.equals("quit") || baseCommand.equals("q")){
+            if (state == State.SIGNEDIN){
+                server.Logout(sessionToken);
+            }
+
+            return;
+        }
         // Unknown Command Handling
         else {
             System.out.println(RED + "Unknown command. Type 'help' for a list of commands." + RESET);
