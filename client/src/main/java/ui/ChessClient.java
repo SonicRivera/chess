@@ -101,18 +101,18 @@ public class ChessClient {
 
             // List
             else if (baseCommand.equals("list")) {
-                server.listGames();
+                server.listGames(sessionToken);
             }
 
             // Join
             else if (baseCommand.equals("join")) {
                 String[] joinArgs = arguments.split("\\s+");
-                if (joinArgs.length < 1 || joinArgs[0].isEmpty()) {
-                    System.out.println(RED + "Please specify the game ID to join." + RESET);
+                if (joinArgs.length < 2 || joinArgs[0].isEmpty()) {
+                    System.out.println(RED + "Please specify the game ID and a team color to join." + RESET);
                 } else {
                     String gameId = joinArgs[0];
                     String color = (joinArgs.length >= 2) ? joinArgs[1].toUpperCase() : "ANY";
-                    server.joinGame(gameId, color);
+                    server.joinGame(gameId, color, sessionToken);
                 }
             }
 
