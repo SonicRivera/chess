@@ -95,7 +95,7 @@ public class ChessClient {
                 if (arguments.isEmpty()) {
                     System.out.println(RED + "You must provide a game name." + RESET);
                 } else {
-                    server.createGame(arguments);
+                    server.createGame(arguments, sessionToken);
                 }
             }
 

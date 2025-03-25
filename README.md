@@ -57,7 +57,7 @@ https://sequencediagram.org/index.html?presentationMode=readOnly#initialData=IYY
 
 ## TODO
 - [x] Logout
-- [ ] Create Game
+- [x] Create Game
 - [ ] List Games
 - [ ] Play Game
   - draw board

@@ -141,7 +141,41 @@ public class ServerFacade {
     }
 
 
-    public static void createGame(String gameName) {
+    public static void createGame(String gameName, String sessionToken) {
+        try {
+
+            String url = serverUrl + "/game";
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Authorization", sessionToken); // Include the token
+            connection.setDoOutput(true);
+
+            // Create JSON payload
+            String payload = String.format("{\"gameName\":\"%s\"}", gameName);
+
+            // Send the request
+            try (OutputStream os = connection.getOutputStream()) {
+                os.write(payload.getBytes());
+                os.flush();
+            }
+
+            // Read the response
+            int responseCode = connection.getResponseCode();
+            if (responseCode == 200) {
+                System.out.println("Successfully created game " + gameName);
+
+            } else {
+                try (InputStream is = connection.getErrorStream()) {
+                    String error = new String(is.readAllBytes());
+                    JsonObject json = JsonParser.parseString(error).getAsJsonObject();
+                    System.out.println("Error during creation: " + json.get("message").getAsString());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error during creation: " + e.getMessage());
+        }
+
     }
 
     public static void joinGame(String gameId, String color) {
