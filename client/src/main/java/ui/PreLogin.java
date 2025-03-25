@@ -8,11 +8,15 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
+import client.ServerFacade;
+
+
 
 public class PreLogin {
 
     private static String sessionToken = null;
     public static boolean loggedIn;
+    ServerFacade server;
 
 
     // Coloring
@@ -21,7 +25,8 @@ public class PreLogin {
     private static final String CYAN = "\u001B[36m";
     private static final String YELLOW = "\u001B[33m";
 
-    public PreLogin(){
+    public PreLogin(ServerFacade server){
+        this.server = server;
         loggedIn = false;
     }
 
@@ -69,7 +74,7 @@ public class PreLogin {
                     String[] loginInfo = new String[2];
                     System.arraycopy(info, 1, loginInfo, 0, 2);
                     if (Login(loginInfo)){
-                        PostLogin postlogin = new PostLogin(sessionToken);
+                        PostLogin postlogin = new PostLogin(sessionToken, server);
                         postlogin.run();
                         loggedIn = true;
                     }

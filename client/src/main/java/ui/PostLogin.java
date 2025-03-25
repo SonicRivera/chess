@@ -1,5 +1,6 @@
 package ui;
 
+import client.ServerFacade;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -12,6 +13,7 @@ public class PostLogin {
 
     private static String sessionToken;
     private static boolean loggedIn;
+    static ServerFacade server;
 
     // Coloring
     private static final String RESET = "\u001B[0m";
@@ -19,8 +21,9 @@ public class PostLogin {
     private static final String CYAN = "\u001B[36m";
     private static final String YELLOW = "\u001B[33m";
 
-    public PostLogin(String sessionToken){
+    public PostLogin(String sessionToken, ServerFacade server){
         PostLogin.sessionToken = sessionToken;
+        this.server = server;
         loggedIn = true;
     }
 
@@ -125,7 +128,7 @@ public class PostLogin {
             if (responseCode == 200) {
                 System.out.println("Logout successful!");
                 sessionToken = null;
-                PreLogin preLogin = new PreLogin();
+                PreLogin preLogin = new PreLogin(server);
                 loggedIn = false;
                 if (quit){
                     return;
