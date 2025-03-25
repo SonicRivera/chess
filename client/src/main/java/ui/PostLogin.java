@@ -31,7 +31,7 @@ public class PostLogin {
 
 
         Scanner scanner = new Scanner(System.in);
-        String command = "";
+        String command;
         String prefix = RED + "[Logged In] " + RESET + " >>> ";
 
         while (loggedIn) {
@@ -103,9 +103,6 @@ public class PostLogin {
                 System.out.println(RED + "Unknown command. Type 'help' for a list of commands." + RESET);
             }
         }
-
-        PreLogin preLogin = new PreLogin();
-        preLogin.run();
 
     }
 
