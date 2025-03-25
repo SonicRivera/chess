@@ -17,10 +17,12 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("♕ Welcome to Chess. Type \"Help\" for options. ♕");
-        Server server = new Server();
-        server.run(832);
-        PreLogin preLogin = new PreLogin();
-        preLogin.run();
+        var serverUrl = "http://localhost:8080";
+        if (args.length == 1){
+            serverUrl = args[0];
+        }
+
+        new PostLogin(serverUrl).run();
 
         System.out.println("Exiting...");
         System.exit(0);
