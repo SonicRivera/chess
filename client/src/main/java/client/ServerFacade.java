@@ -308,7 +308,7 @@ public class ServerFacade {
     }
 
     public static void observeGame(String gameId) {
-        new ChessGame().getBoard().printBoard();
+        printGame(new ChessGame().getBoard(), true);
     }
 
     private static void printGame(ChessBoard board, boolean white){
