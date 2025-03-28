@@ -246,51 +246,65 @@ public class ServerFacade {
 
     public static boolean listGames(String sessionToken) {
         gameList.clear();
+    
         try {
             String url = serverUrl + "/game";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", sessionToken); // Include the token
     
-            // Read the response
+            // Read the response code
             int responseCode = connection.getResponseCode();
-            if (responseCode == 200) {
-                try (InputStream is = connection.getInputStream()) {
-                    String response = new String(is.readAllBytes());
-                    JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
+            if (responseCode != 200) {
+                handleErrorResponse(connection);
+                return false;
+            }
     
-                    // Assuming the server returns a JSON array of games under the key "games"
-                    if (jsonResponse.has("games")) {
-
-                    for (int i = 0; i < jsonResponse.getAsJsonArray("games").size(); i++) {
-                        JsonObject game = jsonResponse.getAsJsonArray("games").get(i).getAsJsonObject();
-                        String gameId = game.get("gameID").getAsString(); // Store the game ID
-                        String gameName = game.get("gameName").getAsString();
-                        String whitePlayer = game.has("whiteUsername") ? game.get("whiteUsername").getAsString() : "None";
-                        String blackPlayer = game.has("blackUsername") ? game.get("blackUsername").getAsString() : "None";
-
-                        // Add the game ID to the list
-                        gameList.add(gameId);
-
-                        // Print the game details in a numbered list
-                        System.out.printf("%d. %s (White: %s, Black: %s)%n", i + 1, gameName, whitePlayer, blackPlayer);
-                    }
-                    } else {
-                        System.out.println("No games available.");
-                    }
+            // Parse the response
+            try (InputStream is = connection.getInputStream()) {
+                String response = new String(is.readAllBytes());
+                JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
+    
+                // Check if the "games" key exists
+                if (!jsonResponse.has("games")) {
+                    System.out.println("No games available.");
                     return true;
                 }
-            } else {
-                try (InputStream is = connection.getErrorStream()) {
-                    String error = new String(is.readAllBytes());
-                    JsonObject json = JsonParser.parseString(error).getAsJsonObject();
-                    System.out.println("Error: " + json.get("message").getAsString());
-                }
+    
+                // Process the games array
+                jsonResponse.getAsJsonArray("games").forEach(gameElement -> {
+                    JsonObject game = gameElement.getAsJsonObject();
+                    String gameId = game.get("gameID").getAsString();
+                    String gameName = game.get("gameName").getAsString();
+                    String whitePlayer = game.has("whiteUsername") ? game.get("whiteUsername").getAsString() : "None";
+                    String blackPlayer = game.has("blackUsername") ? game.get("blackUsername").getAsString() : "None";
+    
+                    // Add the game ID to the list
+                    gameList.add(gameId);
+    
+                    // Print the game details
+                    System.out.printf("%d. %s (White: %s, Black: %s)%n", gameList.size(), gameName, whitePlayer, blackPlayer);
+                });
             }
+    
+            return true;
+    
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
+            return false;
         }
-        return false;
+    }
+    
+    private static void handleErrorResponse(HttpURLConnection connection) {
+        try (InputStream is = connection.getErrorStream()) {
+            if (is != null) {
+                String error = new String(is.readAllBytes());
+                JsonObject json = JsonParser.parseString(error).getAsJsonObject();
+                System.out.println("Error: " + json.get("message").getAsString());
+            }
+        } catch (Exception e) {
+            System.out.println("Error reading error response: " + e.getMessage());
+        }
     }
 
     public static void observeGame(String gameId) {

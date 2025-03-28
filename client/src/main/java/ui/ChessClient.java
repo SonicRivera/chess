@@ -33,8 +33,10 @@ public class ChessClient {
         if (state == State.SIGNEDOUT){
             // Help command
             if (baseCommand.equals("help") || baseCommand.equals("h")) {
-                System.out.println(blueText + "register " + yellowText + "<USERNAME> <PASSWORD> <EMAIL>" + EscapeSequences.RESET_TEXT_COLOR + " - account creation");
-                System.out.println(blueText + "login " + yellowText + "<USERNAME> <PASSWORD>" + EscapeSequences.RESET_TEXT_COLOR + " - to play chess");
+                System.out.println(blueText + "register " + yellowText + "<USERNAME> <PASSWORD> <EMAIL>" +
+                        EscapeSequences.RESET_TEXT_COLOR + " - account creation");
+                System.out.println(blueText + "login " + yellowText + "<USERNAME> <PASSWORD>" +
+                        EscapeSequences.RESET_TEXT_COLOR + " - to play chess");
                 System.out.println(blueText + "quit" + resetText + " - quit playing chess");
                 System.out.println(blueText + "help" + resetText + " - Show possible commands");
             }
