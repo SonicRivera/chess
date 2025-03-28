@@ -88,25 +88,6 @@ public class ChessBoard {
         board[7][6] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
         board[7][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
 
-//        printBoard();
-    }
-
-    /**
-     * Prints out a representation of the chessboard
-     */
-    public void printBoard() {
-        for (int i = 7; i >= 0; i--) {
-            for (int j = 0; j < 8; j++) {
-                ChessPiece piece = board[i][j];
-                if (piece == null) {
-                    System.out.print(". ");
-                } else {
-                    System.out.print(piece.getSymbol() + " ");
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
     }
 
     public ChessPosition getWhiteKingPos(){
