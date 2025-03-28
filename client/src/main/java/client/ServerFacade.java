@@ -196,6 +196,14 @@ public class ServerFacade {
     public static boolean joinGame(String gameId, String color, String sessionToken) {
         int game = Integer.parseInt(gameId);
 
+        if (game < 1 || !gameList.contains(game)) {
+            System.out.println("Please enter an ID from the list.");
+            listGames(sessionToken);
+            return false;
+        }
+
+
+
         try {
             if (sessionToken == null || sessionToken.isEmpty()) {
                 System.out.println("Error: No session token found. Please log in first.");
@@ -286,6 +294,10 @@ public class ServerFacade {
                     System.out.printf("%d. %s (White: %s, Black: %s)%n", gameList.size(), gameName, whitePlayer, blackPlayer);
                 });
             }
+
+            if (gameList.isEmpty()) {
+                System.out.println("No active games... You should create one!");
+            }
     
             return true;
     
@@ -317,7 +329,7 @@ public class ServerFacade {
         System.out.println(columnLabels);
 
         for (int i = (white ? 7 : 0); (white ? i >= 0 : i <= 7); i += (white ? -1 : 1)) {
-                for (int j = 0; j < 8; j++) {
+                for (int j = (white ? 0 : 7); (white ? j < 8 : j >= 0); j+= (white ? 1 : -1)) {
                     if ((i + j) % 2 == 0){
                         color = "\u001b[100m";
                     } else {
