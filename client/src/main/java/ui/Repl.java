@@ -13,8 +13,8 @@ public class Repl {
     public void run() {
 
         // Colors
-        String RED = EscapeSequences.SET_TEXT_COLOR_RED;
-        String RESET = EscapeSequences.RESET_TEXT_COLOR;
+        String redText = EscapeSequences.SET_TEXT_COLOR_RED;
+        String resetText = EscapeSequences.RESET_TEXT_COLOR;
 
         Scanner scanner = new Scanner(System.in);
         String command = "";
@@ -24,9 +24,9 @@ public class Repl {
         while (!command.equalsIgnoreCase("Quit") && !command.equalsIgnoreCase("Q")) {
 
             if (client.state == State.SIGNEDOUT){
-                prefix = RED + "[Logged Out] " + RESET + " >>> ";
+                prefix = redText + "[Logged Out] " + resetText + " >>> ";
             } else {
-                prefix = RED + "[Logged In] " + RESET + " >>> ";
+                prefix = redText + "[Logged In] " + resetText + " >>> ";
             }
             System.out.print(prefix);
             command = scanner.nextLine();

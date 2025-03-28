@@ -24,7 +24,7 @@ public class ServerFacadeTests {
     public void cleanSlate() {
         facade.clear();
         String[] args = {"Username", "SuperSecurePassword", "email@email.com"};
-        String authToken = facade.Register(args);
+        String authToken = facade.register(args);
     }
 
     @AfterAll
@@ -38,7 +38,7 @@ public class ServerFacadeTests {
     public void negativeRegisterTest() {
         facade.clear();
         String[] args = {"Username", "email@email.com"};
-        String authToken = facade.Register(args);
+        String authToken = facade.register(args);
 
         assert authToken.isEmpty();
     }
@@ -47,7 +47,7 @@ public class ServerFacadeTests {
     public void positiveRegisterTest() {
         facade.clear();
         String[] args = {"Username", "SuperSecurePassword", "email@email.com"};
-        String authToken = facade.Register(args);
+        String authToken = facade.register(args);
 
         assertTrue(!authToken.isEmpty());
 
@@ -57,9 +57,9 @@ public class ServerFacadeTests {
     public void negativeLoginTest() {
         facade.clear();
         String[] args = {"Username", "SuperSecurePassword", "email@email.com"};
-        facade.Register(args);
+        facade.register(args);
         args = new String[] {"Username", "WrongPassword"};
-        String authToken = facade.Login(args);
+        String authToken = facade.login(args);
 
         assert authToken.isEmpty();
     }
@@ -67,7 +67,7 @@ public class ServerFacadeTests {
     @Test
     public void positiveLoginTest() {
         String[] args = {"Username", "SuperSecurePassword"};
-        String authToken = facade.Login(args);
+        String authToken = facade.login(args);
 
         assertTrue(!authToken.isEmpty());
         
@@ -77,15 +77,15 @@ public class ServerFacadeTests {
     public void negativeLogoutTest() {
         // Try to log out without being logged in
         String authToken = "";
-        assertTrue(!facade.Logout(authToken));
+        assertTrue(!facade.logout(authToken));
     }
 
     @Test
     public void positiveLogoutTest() {
         String[] args = {"Username", "SuperSecurePassword"};
-        String authToken = facade.Login(args);
+        String authToken = facade.login(args);
 
-        assertTrue(facade.Logout(authToken));
+        assertTrue(facade.logout(authToken));
         
     }
 
@@ -98,7 +98,7 @@ public class ServerFacadeTests {
     @Test
     public void positiveCreateGameTest() {
         String[] args = {"Username", "SuperSecurePassword"};
-        String authToken = facade.Login(args);
+        String authToken = facade.login(args);
 
         assertTrue(facade.createGame("testGame", authToken));
 
@@ -108,9 +108,9 @@ public class ServerFacadeTests {
     public void negativeJoinGameTest() {
         // Try to join a game without being logged in.
         String[] args = {"Username", "SuperSecurePassword"};
-        String authToken = facade.Login(args);
+        String authToken = facade.login(args);
         facade.createGame("testGame", authToken);
-        facade.Logout(authToken);
+        facade.logout(authToken);
 
         assertTrue(!facade.joinGame("1", "WHITE", authToken));
     }
@@ -118,7 +118,7 @@ public class ServerFacadeTests {
     @Test
     public void positiveJoinGameTest() {
         String[] args = {"Username", "SuperSecurePassword"};
-        String authToken = facade.Login(args);
+        String authToken = facade.login(args);
         facade.createGame("testGame", authToken);
         facade.listGames(authToken);
 
@@ -130,12 +130,12 @@ public class ServerFacadeTests {
     public void negativeListGameTest() {
         // Try to list games without being logged in.
         String[] args = {"Username", "SuperSecurePassword"};
-        String authToken = facade.Login(args);
+        String authToken = facade.login(args);
         facade.createGame("testGame", authToken);
         facade.createGame("testGame2", authToken);
         facade.createGame("testGame3", authToken);
         facade.createGame("testGame4", authToken);
-        facade.Logout(authToken);
+        facade.logout(authToken);
 
         assertTrue(!facade.listGames(authToken));
     }
@@ -143,7 +143,7 @@ public class ServerFacadeTests {
     @Test
     public void positiveListGameTest() {
         String[] args = {"Username", "SuperSecurePassword"};
-        String authToken = facade.Login(args);
+        String authToken = facade.login(args);
         facade.createGame("testGame", authToken);
         facade.createGame("testGame2", authToken);
         facade.createGame("testGame3", authToken);

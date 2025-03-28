@@ -24,7 +24,7 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public static String Register(String[] info) {
+    public static String register(String[] info) {
         try {
             String url = serverUrl + "/user";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -71,7 +71,7 @@ public class ServerFacade {
     }
 
 
-    public static String Login(String[] info) {
+    public static String login(String[] info) {
         try {
             String url = serverUrl + "/session";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -118,7 +118,7 @@ public class ServerFacade {
         return "";
     }
 
-    public static boolean Logout(String sessionToken) {
+    public static boolean logout(String sessionToken) {
         try {
             if (sessionToken == null) {
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "No session token, please log in.");
