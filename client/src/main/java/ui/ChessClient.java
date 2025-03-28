@@ -64,6 +64,7 @@ public class ChessClient {
                     sessionToken = server.Login(loginArgs);
                     if (!sessionToken.isEmpty()){
                         state = state.SIGNEDIN;
+                        server.listGames(sessionToken);
                     }
 
                 }
@@ -109,10 +110,21 @@ public class ChessClient {
                 String[] joinArgs = arguments.split("\\s+");
                 if (joinArgs.length < 2 || joinArgs[0].isEmpty()) {
                     System.out.println(RED + "Please specify the game ID and a team color to join." + RESET);
-                } else {
-                    String gameId = joinArgs[0];
-                    String color = (joinArgs.length >= 2) ? joinArgs[1].toUpperCase() : "ANY";
-                    server.joinGame(gameId, color, sessionToken);
+                    return;
+                }
+
+                String gameId = joinArgs[0];
+                String color = (joinArgs.length >= 2) ? joinArgs[1].toUpperCase() : "ANY";
+
+                try {
+                    int gameNum = Integer.parseInt(gameId);
+                } catch (Exception e) {
+                    System.out.println("Please use a number from the list as a gameID");
+                    return;
+                }
+
+                if (server.joinGame(gameId, color, sessionToken)) {
+                    // state = State.PLAYING; // Use this later
                 }
             }
 
@@ -123,6 +135,7 @@ public class ChessClient {
                     System.out.println(RED + "Please specify the game ID to observe." + RESET);
                 } else {
                     server.observeGame(observeArgs[0]);
+                    // state = State.OBSERVING; // Add this in later for functionality
                 }
             }
 

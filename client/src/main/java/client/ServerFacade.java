@@ -1,7 +1,13 @@
 package client;
 
+import chess.ChessGame;
+import chess.ChessPiece;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import chess.ChessBoard;
 import ui.EscapeSequences;
 
 import java.io.InputStream;
@@ -182,13 +188,13 @@ public class ServerFacade {
 
     }
 
-    public static void joinGame(String gameId, String color, String sessionToken) {
+    public static boolean joinGame(String gameId, String color, String sessionToken) {
         int game = Integer.parseInt(gameId);
 
         try {
             if (sessionToken == null || sessionToken.isEmpty()) {
                 System.out.println("Error: No session token found. Please log in first.");
-                return;
+                return false;
             }
 
             String url = serverUrl + "/game";
@@ -211,7 +217,13 @@ public class ServerFacade {
             // Read the response
             int responseCode = connection.getResponseCode();
             if (responseCode == 200) {
-                System.out.println("Successfully joined game " + gameId + " as " + color + ".");
+                if (color == "white"){
+                    printGame(new ChessGame().getBoard(), true);
+                } else {
+                    printGame(new ChessGame().getBoard(), false);
+                }
+
+                return true;
             } else {
                 try (InputStream is = connection.getErrorStream()) {
                     String error = new String(is.readAllBytes());
@@ -222,6 +234,8 @@ public class ServerFacade {
         } catch (Exception e) {
             System.out.println("Error during joining game: " + e.getMessage());
         }
+
+        return false;
     }
 
     public static void listGames(String sessionToken) {
@@ -272,8 +286,55 @@ public class ServerFacade {
     }
 
     public static void observeGame(String gameId) {
+        new ChessGame().getBoard().printBoard();
     }
 
+    private static void printGame(ChessBoard board, boolean white){
+        String color;
 
 
+        // White Board
+
+        if (white){
+            for (int i = 7; i >= 0; i--) {
+                for (int j = 0; j < 8; j++) {
+                    if ((i + j) % 2 == 0){
+                        color = "\u001b[47m";
+                    } else {
+                        color = "\u001b[100m";
+                    }
+
+
+                    ChessPiece piece = board.board[i][j];
+                    if (piece == null) {
+                        System.out.print(color + ". " + "\u001b[0m");
+                    } else {
+                        System.out.print(color + piece.getSymbol() + " " + "\u001b[0m");
+                    }
+                }
+                System.out.println();
+            }
+            System.out.println();
+        } else {
+            // Black Board
+            for (int i = 0; i <= 7; i++) {
+                for (int j = 0; j < 8; j++) {
+                    if ((i + j) % 2 == 0){
+                        color = "\u001b[47m";
+                    } else {
+                        color = "\u001b[100m";
+                    }
+
+                    ChessPiece piece = board.board[i][j];
+                    if (piece == null) {
+                        System.out.print(color + "  " + "\u001b[0m");
+                    } else {
+                        System.out.print(color + piece.getSymbol() + " " + "\u001b[0m");
+                    }
+                }
+                System.out.println();
+            }
+            System.out.println();
+            }
+        }
 }
