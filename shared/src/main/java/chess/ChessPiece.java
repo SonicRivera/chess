@@ -63,49 +63,33 @@ public class ChessPiece {
     }
 
     public String getSymbol() {
+        String whiteColor = "\u001b[31m"; // Red text for white
+        String blackColor = "\u001b[34m"; // Blue text for black
+        String resetColor = "\u001b[0m";  // Reset color
+    
+        String symbol;
         if (this.getPieceType() == PieceType.KING) {
-            if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                return " ♚ ";
-            } else {
-                return " ♔ ";
-            }
+            symbol = " K ";
+        } else if (this.getPieceType() == PieceType.QUEEN) {
+            symbol = " Q ";
+        } else if (this.getPieceType() == PieceType.BISHOP) {
+            symbol = " B ";
+        } else if (this.getPieceType() == PieceType.KNIGHT) {
+            symbol = " N ";
+        } else if (this.getPieceType() == PieceType.ROOK) {
+            symbol = " R ";
+        } else if (this.getPieceType() == PieceType.PAWN) {
+            symbol = " P ";
+        } else {
+            return null; // Invalid piece type
         }
-        if (this.getPieceType() == PieceType.BISHOP) {
-            if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                return " ♝ ";
-            } else {
-                return " ♗ ";
-            }
+    
+        // Add color based on team
+        if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
+            return blackColor + symbol + resetColor;
+        } else {
+            return whiteColor + symbol + resetColor;
         }
-        if (this.getPieceType() == PieceType.KNIGHT) {
-            if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                return " ♞ ";
-            } else {
-                return " ♘ ";
-            }
-        }
-        if (this.getPieceType() == PieceType.PAWN) {
-            if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                return " ♟ ";
-            } else {
-                return " ♙ ";
-            }
-        }
-        if (this.getPieceType() == PieceType.QUEEN) {
-            if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                return " ♛ ";
-            } else {
-                return " ♕ ";
-            }
-        }
-        if (this.getPieceType() == PieceType.ROOK) {
-            if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                return " ♜ ";
-            } else {
-                return " ♖ ";
-            }
-        }
-        return null;
     }
 
     /**

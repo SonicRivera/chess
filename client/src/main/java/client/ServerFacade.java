@@ -1,21 +1,18 @@
 package client;
 
-import chess.ChessGame;
-import chess.ChessPiece;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import chess.ChessBoard;
-import ui.EscapeSequences;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import ui.EscapeSequences;
 
 public class ServerFacade {
 
@@ -156,7 +153,7 @@ public class ServerFacade {
     }
 
 
-    public static void createGame(String gameName, String sessionToken) {
+    public static boolean createGame(String gameName, String sessionToken) {
         try {
 
             String url = serverUrl + "/game";
@@ -179,6 +176,7 @@ public class ServerFacade {
             int responseCode = connection.getResponseCode();
             if (responseCode == 200) {
                 System.out.println("Successfully created game " + gameName);
+                return true;
 
             } else {
                 try (InputStream is = connection.getErrorStream()) {
@@ -190,6 +188,8 @@ public class ServerFacade {
         } catch (Exception e) {
             System.out.println("Error during creation: " + e.getMessage());
         }
+
+        return false;
 
     }
 
@@ -244,7 +244,7 @@ public class ServerFacade {
         return false;
     }
 
-    public static void listGames(String sessionToken) {
+    public static boolean listGames(String sessionToken) {
         gameList.clear();
         try {
             String url = serverUrl + "/game";
@@ -278,6 +278,7 @@ public class ServerFacade {
                     } else {
                         System.out.println("No games available.");
                     }
+                    return true;
                 }
             } else {
                 try (InputStream is = connection.getErrorStream()) {
@@ -289,6 +290,7 @@ public class ServerFacade {
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
+        return false;
     }
 
     public static void observeGame(String gameId) {
@@ -303,6 +305,7 @@ public class ServerFacade {
 
         if (white){
             System.out.println("Printing white board");
+            System.out.println("\u001b[100m a  b  c  d  e  f  g  h    \u001b[0m");
             for (int i = 7; i >= 0; i--) {
                 for (int j = 0; j < 8; j++) {
                     if ((i + j) % 2 == 0){
@@ -314,17 +317,21 @@ public class ServerFacade {
 
                     ChessPiece piece = board.board[i][j];
                     if (piece == null) {
-                        System.out.print(color + " \u2003 " + "\u001b[0m");
+                        System.out.print(color + "   " + "\u001b[0m");
                     } else {
                         System.out.print(color + piece.getSymbol() + "\u001b[0m");
                     }
                 }
-                System.out.println();
+                System.out.println("\u001b[100m " + (i + 1) + " \u001b[0m");
             }
+
+            System.out.println("\u001b[100m a  b  c  d  e  f  g  h    \u001b[0m");
             System.out.println();
+
         } else {
             // Black Board
             System.out.println("Printing black board");
+            System.out.println("\u001b[100m h  g  f  e  d  c  b  a    \u001b[0m");
 
             for (int i = 0; i <= 7; i++) {
                 for (int j = 0; j < 8; j++) {
@@ -336,14 +343,36 @@ public class ServerFacade {
 
                     ChessPiece piece = board.board[i][j];
                     if (piece == null) {
-                        System.out.print(color + " \u2003 " + "\u001b[0m");
+                        System.out.print(color + "   " + "\u001b[0m");
                     } else {
                         System.out.print(color + piece.getSymbol() + "\u001b[0m");
                     }
                 }
-                System.out.println();
+                System.out.println("\u001b[100m " + (i + 1) + " \u001b[0m");
             }
+
+            System.out.println("\u001b[100m h  g  f  e  d  c  b  a    \u001b[0m");
             System.out.println();
             }
         }
+
+
+
+    public void clear(){
+        try {
+            String url = serverUrl + "/db";
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("DELETE");
+
+            // Get the response code
+            int responseCode = connection.getResponseCode();
+
+            // Check if the response code is 200
+            if (responseCode == 200) {
+                System.out.println("Request was successful!");
+            }
+        } catch (Exception e) {
+            System.out.println("Ruh Roh Raggy...");
+        }
+    }
 }
