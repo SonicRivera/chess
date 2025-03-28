@@ -65,44 +65,44 @@ public class ChessPiece {
     public String getSymbol() {
         if (this.getPieceType() == PieceType.KING) {
             if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                return "k";
+                return " ♚ ";
             } else {
-                return "K";
+                return " ♔ ";
             }
         }
         if (this.getPieceType() == PieceType.BISHOP) {
             if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                return "b";
+                return " ♝ ";
             } else {
-                return "B";
+                return " ♗ ";
             }
         }
         if (this.getPieceType() == PieceType.KNIGHT) {
             if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                return "n";
+                return " ♞ ";
             } else {
-                return "N";
+                return " ♘ ";
             }
         }
         if (this.getPieceType() == PieceType.PAWN) {
             if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                return "p";
+                return " ♟ ";
             } else {
-                return "P";
+                return " ♙ ";
             }
         }
         if (this.getPieceType() == PieceType.QUEEN) {
             if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                return "q";
+                return " ♛ ";
             } else {
-                return "Q";
+                return " ♕ ";
             }
         }
         if (this.getPieceType() == PieceType.ROOK) {
             if (this.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                return "r";
+                return " ♜ ";
             } else {
-                return "R";
+                return " ♖ ";
             }
         }
         return null;

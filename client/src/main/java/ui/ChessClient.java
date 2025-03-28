@@ -47,8 +47,10 @@ public class ChessClient {
                 } else if (regArgs.length > 3) {
                     System.out.println(RED + "Please only input a username, password, and an email.");
                 } else {
-                    if (server.Register(regArgs)) {
+                    sessionToken = server.Register(regArgs);
+                    if (!sessionToken.isEmpty()) {
                         state = State.SIGNEDIN;
+                        server.listGames(sessionToken);
                     }
                 }
             }
@@ -97,6 +99,7 @@ public class ChessClient {
                     System.out.println(RED + "You must provide a game name." + RESET);
                 } else {
                     server.createGame(arguments, sessionToken);
+                    server.listGames(sessionToken);
                 }
             }
 
@@ -115,6 +118,10 @@ public class ChessClient {
 
                 String gameId = joinArgs[0];
                 String color = (joinArgs.length >= 2) ? joinArgs[1].toUpperCase() : "ANY";
+                if (!color.equals("WHITE") && !color.equals("BLACK")) {
+                    System.out.println(RED + "Invalid color. Please specify either 'WHITE' or 'BLACK'." + RESET);
+                    return;
+                }
 
                 try {
                     int gameNum = Integer.parseInt(gameId);

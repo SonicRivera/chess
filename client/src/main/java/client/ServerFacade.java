@@ -27,7 +27,7 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public static boolean Register(String[] info) {
+    public static String Register(String[] info) {
         try {
             String url = serverUrl + "/user";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -51,8 +51,13 @@ public class ServerFacade {
                 System.out.println("Registration successful!");
                 String[] loginInfo = new String[2];
                 System.arraycopy(info, 0, loginInfo, 0, 2);
-                Login(loginInfo);
-                return true;
+
+                // Try getting the authToken from response
+                try (InputStream is = connection.getInputStream()) {
+                    String response = new String(is.readAllBytes());
+                    JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+                    return json.get("authToken").getAsString();
+                }
 
             } else {
                 try (InputStream is = connection.getErrorStream()) {
@@ -65,7 +70,7 @@ public class ServerFacade {
             System.out.println("Error during registration: " + e.getMessage());
         }
 
-        return false;
+        return "";
     }
 
 
@@ -217,7 +222,8 @@ public class ServerFacade {
             // Read the response
             int responseCode = connection.getResponseCode();
             if (responseCode == 200) {
-                if (color == "white"){
+                System.out.println("COLOR IS: " + color);
+                if (color.equals("WHITE")){
                     printGame(new ChessGame().getBoard(), true);
                 } else {
                     printGame(new ChessGame().getBoard(), false);
@@ -260,8 +266,8 @@ public class ServerFacade {
                         JsonObject game = jsonResponse.getAsJsonArray("games").get(i).getAsJsonObject();
                         String gameId = game.get("gameID").getAsString(); // Store the game ID
                         String gameName = game.get("gameName").getAsString();
-                        String whitePlayer = game.has("whitePlayer") ? game.get("whitePlayer").getAsString() : "None";
-                        String blackPlayer = game.has("blackPlayer") ? game.get("blackPlayer").getAsString() : "None";
+                        String whitePlayer = game.has("whiteUsername") ? game.get("whiteUsername").getAsString() : "None";
+                        String blackPlayer = game.has("blackUsername") ? game.get("blackUsername").getAsString() : "None";
 
                         // Add the game ID to the list
                         gameList.add(gameId);
@@ -296,20 +302,21 @@ public class ServerFacade {
         // White Board
 
         if (white){
+            System.out.println("Printing white board");
             for (int i = 7; i >= 0; i--) {
                 for (int j = 0; j < 8; j++) {
                     if ((i + j) % 2 == 0){
-                        color = "\u001b[47m";
-                    } else {
                         color = "\u001b[100m";
+                    } else {
+                        color = "\u001b[47m";
                     }
 
 
                     ChessPiece piece = board.board[i][j];
                     if (piece == null) {
-                        System.out.print(color + ". " + "\u001b[0m");
+                        System.out.print(color + " \u2003 " + "\u001b[0m");
                     } else {
-                        System.out.print(color + piece.getSymbol() + " " + "\u001b[0m");
+                        System.out.print(color + piece.getSymbol() + "\u001b[0m");
                     }
                 }
                 System.out.println();
@@ -317,19 +324,21 @@ public class ServerFacade {
             System.out.println();
         } else {
             // Black Board
+            System.out.println("Printing black board");
+
             for (int i = 0; i <= 7; i++) {
                 for (int j = 0; j < 8; j++) {
                     if ((i + j) % 2 == 0){
-                        color = "\u001b[47m";
-                    } else {
                         color = "\u001b[100m";
+                    } else {
+                        color = "\u001b[47m";
                     }
 
                     ChessPiece piece = board.board[i][j];
                     if (piece == null) {
-                        System.out.print(color + "  " + "\u001b[0m");
+                        System.out.print(color + " \u2003 " + "\u001b[0m");
                     } else {
-                        System.out.print(color + piece.getSymbol() + " " + "\u001b[0m");
+                        System.out.print(color + piece.getSymbol() + "\u001b[0m");
                     }
                 }
                 System.out.println();
