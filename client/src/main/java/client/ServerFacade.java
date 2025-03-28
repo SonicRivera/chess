@@ -196,7 +196,7 @@ public class ServerFacade {
     public static boolean joinGame(String gameId, String color, String sessionToken) {
         int game = Integer.parseInt(gameId);
 
-        if (game < 1 || !gameList.contains(game)) {
+        if (game < 1 || (game > gameList.size())) {
             System.out.println("Please enter an ID from the list.");
             listGames(sessionToken);
             return false;
@@ -276,7 +276,7 @@ public class ServerFacade {
                 // Check if the "games" key exists
                 if (!jsonResponse.has("games")) {
                     System.out.println("No games available.");
-                    return true;
+                    return false;
                 }
     
                 // Process the games array
