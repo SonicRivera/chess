@@ -37,6 +37,12 @@ public class ChessClient {
             case SIGNEDIN:
                 handleSignedInCommands(parsedCommand);
                 break;
+            case PLAYING:
+                handlePlayingCommands(parsedCommand);
+                break;
+            case OBSERVING:
+                handleObservingCommands(parsedCommand);
+                break;
             default:
                 if (parsedCommand.baseCommand.equals("quit") || parsedCommand.baseCommand.equals("q")) {
                     handleQuitCommand();
@@ -46,18 +52,19 @@ public class ChessClient {
                 break;
         }
     }
-    
+
+
     // Helper class to represent a parsed command
     private static class Command {
         String baseCommand;
         String arguments;
-    
+
         Command(String baseCommand, String arguments) {
             this.baseCommand = baseCommand;
             this.arguments = arguments;
         }
     }
-    
+
     // Parse the command into baseCommand and arguments
     private Command parseCommand(String command) {
         String[] parts = command.split("\\s+", 2);
@@ -65,12 +72,12 @@ public class ChessClient {
         String arguments = (parts.length > 1) ? parts[1] : "";
         return new Command(baseCommand, arguments);
     }
-    
+
     // Handle commands when the user is signed out
     private void handleSignedOutCommands(Command command) {
         String baseCommand = command.baseCommand;
         String arguments = command.arguments;
-    
+
         switch (baseCommand) {
             case "help":
             case "h":
@@ -86,12 +93,12 @@ public class ChessClient {
                 handleUnknownCommand();
         }
     }
-    
+
     // Handle commands when the user is signed in
     private void handleSignedInCommands(Command command) {
         String baseCommand = command.baseCommand;
         String arguments = command.arguments;
-    
+
         switch (baseCommand) {
             case "help":
             case "h":
@@ -116,13 +123,86 @@ public class ChessClient {
                 handleUnknownCommand();
         }
     }
-    
+
+    private void handlePlayingCommands(Command command) {
+        String baseCommand = command.baseCommand;
+        String arguments = command.arguments;
+
+        switch (baseCommand) {
+            case "help":
+            case "h":
+                printPlayingHelp();
+                break;
+            case "redraw":
+                handleRedrawCommand();
+                break;
+            case "leave":
+                handleLeaveCommand();
+                break;
+            case "move":
+                handleMoveCommand(arguments);
+                break;
+            case "resign":
+                handleResignCommand();
+                break;
+            case "moves":
+                handleLegalMovesCommand();
+                break;
+            default:
+                handleUnknownCommand();
+        }
+    }
+
+    private void handleObservingCommands(Command command) {
+        String baseCommand = command.baseCommand;
+        String arguments = command.arguments;
+
+        switch (baseCommand) {
+            case "help":
+            case "h":
+                printObservingHelp();
+                break;
+            case "redraw":
+                handleRedrawCommand();
+                break;
+            case "leave":
+                handleLeaveCommand();
+                break;
+            case "moves":
+                handleLegalMovesCommand();
+                break;
+            default:
+                handleUnknownCommand();
+        }
+    }
+
+    private void printObservingHelp() {
+    }
+
+    private void handleLegalMovesCommand() {
+    }
+
+    private void handleResignCommand() {
+    }
+
+    private void handleMoveCommand(String arguments) {
+    }
+
+    private void handleLeaveCommand() {
+    }
+
+    private void handleRedrawCommand() {
+    }
+
+    private void printPlayingHelp() {
+    }
+
     // Handle the quit command
     private void handleQuitCommand() {
         System.out.println("Goodbye!");
         System.exit(0);
     }
-    
+
     // Handle unknown commands
     private void handleUnknownCommand() {
         System.out.println("Unknown command. Type 'help' for a list of commands.");
@@ -216,7 +296,7 @@ public class ChessClient {
         }
 
         if (server.joinGame(gameId, color, sessionToken)) {
-            // state = State.PLAYING; // Use this later
+            state = State.PLAYING;
         }
     }
 
@@ -226,7 +306,7 @@ public class ChessClient {
             System.out.println(redText + "Please specify the game ID to observe." + resetText);
         } else {
             server.observeGame(observeArgs[0]);
-            // state = State.OBSERVING; // Add this in later for functionality
+             state = State.OBSERVING;
         }
     }
 
