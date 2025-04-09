@@ -40,6 +40,7 @@ public class GameService {
             gameObject.addProperty("whiteUsername", game.whiteUsername());
             gameObject.addProperty("blackUsername", game.blackUsername());
             gameObject.addProperty("gameName", game.gameName());
+            gameObject.addProperty("chessGame", gson.toJson(game.game()));
             gamesArray.add(gameObject);
         }
 
