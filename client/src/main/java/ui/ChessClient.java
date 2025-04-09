@@ -2,12 +2,14 @@ package ui;
 
 
 import client.ServerFacade;
+import client.WebSocketClient;
 
 public class ChessClient {
 
     private final ServerFacade server;
     public State state = State.SIGNEDOUT;
     private String sessionToken = null;
+    private String serverURL;
 
     // Colors
     String redText = EscapeSequences.SET_TEXT_COLOR_RED;
@@ -19,6 +21,7 @@ public class ChessClient {
 
 
     public ChessClient(String serverUrl){
+        this.serverURL = serverUrl;
         server = new ServerFacade(serverUrl);
     }
 
@@ -214,6 +217,13 @@ public class ChessClient {
 
         if (server.joinGame(gameId, color, sessionToken)) {
             // state = State.PLAYING; // Use this later
+            try {
+                WebSocketClient ws = new WebSocketClient(serverURL);
+                ws.sendConnectCommand(sessionToken, Integer.parseInt(gameId));
+                System.out.println("CONNECT command sent.");
+            } catch (Exception e) {
+                System.out.println("Failed to connect to WebSocket.");
+            }
         }
     }
 

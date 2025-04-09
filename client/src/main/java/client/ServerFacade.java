@@ -230,13 +230,12 @@ public class ServerFacade {
             // Read the response
             int responseCode = connection.getResponseCode();
             if (responseCode == 200) {
-                System.out.println("COLOR IS: " + color);
+                System.out.println("COLOR IS: " + color); // Remove when completed
                 if (color.equals("WHITE")){
                     printGame(new ChessGame().getBoard(), true);
                 } else {
                     printGame(new ChessGame().getBoard(), false);
                 }
-
                 return true;
             } else {
                 try (InputStream is = connection.getErrorStream()) {
@@ -323,7 +322,7 @@ public class ServerFacade {
         printGame(new ChessGame().getBoard(), true);
     }
 
-    private static void printGame(ChessBoard board, boolean white){
+    public static void printGame(ChessBoard board, boolean white){
         String color;
         String columnLabels = white ? "\u001b[100m a  b  c  d  e  f  g  h    \u001b[0m" : "\u001b[100m h  g  f  e  d  c  b  a    \u001b[0m";
         System.out.println(columnLabels);

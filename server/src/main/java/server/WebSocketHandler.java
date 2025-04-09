@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -51,25 +52,32 @@ public class WebSocketHandler {
     }
 
     private void handleConnect(UserGameCommand command, Session session) {
-        // Handle CONNECT command
         System.out.println("Handling CONNECT for gameID: " + command.getGameID());
-        // Send LOAD_GAME and NOTIFICATION messages
+
+        // Send LOAD_GAME message to the client
+        ServerMessage loadGameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+        session.getAsyncRemote().sendText(new Gson().toJson(loadGameMessage));
+
+        // Notify other clients about the new connection
+        ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        for (Session client : clients.keySet()) {
+            if (!client.equals(session)) {
+                client.getAsyncRemote().sendText(new Gson().toJson(notificationMessage));
+            }
+        }
     }
 
     private void handleMakeMove(UserGameCommand command, Session session) {
-        // Handle MAKE_MOVE command
         System.out.println("Handling MAKE_MOVE");
         // Validate move, update game state, and notify clients
     }
 
     private void handleLeave(UserGameCommand command, Session session) {
-        // Handle LEAVE command
         System.out.println("Handling LEAVE");
         // Notify other clients
     }
 
     private void handleResign(UserGameCommand command, Session session) {
-        // Handle RESIGN command
         System.out.println("Handling RESIGN");
         // Notify all clients and mark game as over
     }
