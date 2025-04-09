@@ -18,6 +18,7 @@ public class ServerFacade {
 
     private static String serverUrl;
     private static ArrayList<String> gameList = new ArrayList<>(); // To store game IDs for selection
+    static WebSocketClient ws;
 
 
     public ServerFacade(String url){
@@ -26,7 +27,7 @@ public class ServerFacade {
 
     public static String register(String[] info) {
         try {
-            String url = serverUrl + "/user";
+            String url = "http://" + serverUrl + "/user";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -73,7 +74,7 @@ public class ServerFacade {
 
     public static String login(String[] info) {
         try {
-            String url = serverUrl + "/session";
+            String url = "http://" + serverUrl + "/session";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -127,7 +128,7 @@ public class ServerFacade {
 
 
 
-            String url = serverUrl + "/session";
+            String url = "http://" + serverUrl + "/session";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("DELETE");
             connection.setRequestProperty("Authorization", sessionToken); // Include the token
@@ -156,7 +157,7 @@ public class ServerFacade {
     public static boolean createGame(String gameName, String sessionToken) {
         try {
 
-            String url = serverUrl + "/game";
+            String url = "http://" + serverUrl + "/game";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -210,7 +211,7 @@ public class ServerFacade {
                 return false;
             }
 
-            String url = serverUrl + "/game";
+            String url = "http://" + serverUrl + "/game";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -232,6 +233,11 @@ public class ServerFacade {
             if (responseCode == 200) {
                 System.out.println("COLOR IS: " + color); // Remove when completed
                 if (color.equals("WHITE")){
+                    try {
+                        ws = new WebSocketClient(serverUrl);
+                    } catch (Exception e) {
+                        System.out.println("Failed to connect to WebSocket.");
+                    }
                     printGame(new ChessGame().getBoard(), true);
                 } else {
                     printGame(new ChessGame().getBoard(), false);
@@ -255,7 +261,7 @@ public class ServerFacade {
         gameList.clear();
     
         try {
-            String url = serverUrl + "/game";
+            String url = "http://" + serverUrl + "/game";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Authorization", sessionToken); // Include the token
@@ -354,7 +360,7 @@ public class ServerFacade {
 
     public void clear(){
         try {
-            String url = serverUrl + "/db";
+            String url = "http://" + serverUrl + "/db";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("DELETE");
 

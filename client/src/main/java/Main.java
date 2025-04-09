@@ -5,7 +5,7 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("♕ Welcome to Chess. Type \"Help\" for options. ♕");
-        var serverUrl = "http://localhost:8080";
+        var serverUrl = "localhost:8080";
         if (args.length == 1){
             serverUrl = args[0];
         }

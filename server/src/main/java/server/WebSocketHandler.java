@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -9,7 +10,7 @@ import javax.websocket.server.ServerEndpoint;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@ServerEndpoint("/ws")
+@WebSocket
 public class WebSocketHandler {
     private static Map<Session, String> clients = new ConcurrentHashMap<>();
 

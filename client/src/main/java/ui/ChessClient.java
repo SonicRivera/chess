@@ -217,13 +217,6 @@ public class ChessClient {
 
         if (server.joinGame(gameId, color, sessionToken)) {
             // state = State.PLAYING; // Use this later
-            try {
-                WebSocketClient ws = new WebSocketClient(serverURL);
-                ws.sendConnectCommand(sessionToken, Integer.parseInt(gameId));
-                System.out.println("CONNECT command sent.");
-            } catch (Exception e) {
-                System.out.println("Failed to connect to WebSocket.");
-            }
         }
     }
 
