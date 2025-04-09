@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -194,13 +196,18 @@ public class ServerFacade {
 
     }
 
-    public static boolean joinGame(String gameId, String color, String sessionToken) {
+    public static Map<String, Object> joinGame(String gameId, String color, String sessionToken) {
+        Map<String, Object> data = new HashMap<>();
+
         int game = Integer.parseInt(gameId);
 
         if (game < 1 || (game > gameList.size())) {
             System.out.println("Please enter an ID from the list.");
             listGames(sessionToken);
-            return false;
+            data.put("bool", false);
+            data.put("chessGame", null);
+            data.put("gameID", null);
+            return data;
         }
 
 
@@ -208,7 +215,10 @@ public class ServerFacade {
         try {
             if (sessionToken == null || sessionToken.isEmpty()) {
                 System.out.println("Error: No session token found. Please log in first.");
-                return false;
+                data.put("bool", false);
+                data.put("chessGame", null);
+                data.put("gameID", null);
+                return data;
             }
 
             String url = "http://" + serverUrl + "/game";
@@ -238,11 +248,23 @@ public class ServerFacade {
                     } catch (Exception e) {
                         System.out.println("Failed to connect to WebSocket.");
                     }
-                    printGame(new ChessGame().getBoard(), true);
+                    ChessGame chessGame = new ChessGame();
+                    printGame(chessGame.getBoard(), true);
+                    data.put("bool", true);
+                    data.put("chessGame", chessGame);
+                    data.put("gameID", game);
+                    data.put("color", "white");
+                    return data;
                 } else {
+                    ChessGame chessGame = new ChessGame();
                     printGame(new ChessGame().getBoard(), false);
+                    data.put("bool", true);
+                    data.put("chessGame", chessGame);
+                    data.put("gameID", game);
+                    data.put("color", "black");
+                    return data;
                 }
-                return true;
+
             } else {
                 try (InputStream is = connection.getErrorStream()) {
                     String error = new String(is.readAllBytes());
@@ -254,7 +276,10 @@ public class ServerFacade {
             System.out.println("Error during joining game: " + e.getMessage());
         }
 
-        return false;
+        data.put("bool", false);
+        data.put("chessGame", null);
+        data.put("gameID", null);
+        return data;
     }
 
     public static boolean listGames(String sessionToken) {
@@ -360,7 +385,7 @@ public class ServerFacade {
 
     public void clear(){
         try {
-            String url = "http://" + serverUrl + "/db";
+            String url ="http://" +  serverUrl + "/db";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("DELETE");
 

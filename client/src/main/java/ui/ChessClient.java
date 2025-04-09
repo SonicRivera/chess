@@ -6,6 +6,7 @@ import chess.ChessGame;
 import client.ServerFacade;
 import client.WebSocketClient;
 
+import java.util.Map;
 import java.util.Scanner;
 
 public class ChessClient {
@@ -331,7 +332,10 @@ public class ChessClient {
             return;
         }
 
-        if (server.joinGame(gameId, color, sessionToken)) {
+        Map<String, Object> data = server.joinGame(gameId, color, sessionToken);
+        Boolean success = (Boolean) data.get("bool");
+
+        if (success) {
             state = State.PLAYING;
         }
     }

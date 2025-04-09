@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.*;
 import server.Server;
 
+import java.util.Map;
+
 
 public class ServerFacadeTests {
 
@@ -16,7 +18,7 @@ public class ServerFacadeTests {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-        facade = new ServerFacade("http://localhost:" + port);
+        facade = new ServerFacade("localhost:" + port);
 
     }
 
@@ -112,7 +114,10 @@ public class ServerFacadeTests {
         facade.createGame("testGame", authToken);
         facade.logout(authToken);
 
-        assertTrue(!facade.joinGame("1", "WHITE", authToken));
+        Map<String, Object> result = facade.joinGame("1", "WHITE", authToken);
+        Boolean success = (Boolean) result.get("bool");
+
+        assertTrue(!success);
     }
 
     @Test
@@ -122,7 +127,10 @@ public class ServerFacadeTests {
         facade.createGame("testGame", authToken);
         facade.listGames(authToken);
 
-        assertTrue(facade.joinGame("1", "WHITE", authToken));
+        Map<String, Object> result = facade.joinGame("1", "WHITE", authToken);
+        Boolean success = (Boolean) result.get("bool");
+
+        assertTrue(success);
 
     }
 
