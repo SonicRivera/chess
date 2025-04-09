@@ -1,8 +1,12 @@
 package ui;
 
 
+import chess.ChessBoard;
+import chess.ChessGame;
 import client.ServerFacade;
 import client.WebSocketClient;
+
+import java.util.Scanner;
 
 public class ChessClient {
 
@@ -10,6 +14,9 @@ public class ChessClient {
     public State state = State.SIGNEDOUT;
     private String sessionToken = null;
     private String serverURL;
+    ChessGame chessGame;
+    int gameId;
+
 
     // Colors
     String redText = EscapeSequences.SET_TEXT_COLOR_RED;
@@ -177,24 +184,53 @@ public class ChessClient {
     }
 
     private void printObservingHelp() {
+        System.out.println(blueText + "help" + resetText + " - Show possible commands");
+        System.out.println(blueText + "redraw" + resetText + " - Redraws the chess board");
+        System.out.println(blueText + "leave" + resetText + " - Stops observing the current game");
+        System.out.println(blueText + "moves " + yellowText + "<PIECE>" + resetText + " - Highlights legal moves for a piece");
     }
 
     private void handleLegalMovesCommand() {
     }
 
     private void handleResignCommand() {
+        System.out.println("Are you sure you want to resign? (Y/N)");
+        Scanner scanner = new Scanner(System.in);
+        String answer = scanner.nextLine();
+        while (!(answer.equalsIgnoreCase("Y") || answer.equalsIgnoreCase("N"))) {
+            System.out.println("Please enter a Y for yes or a N for no.");
+            answer = scanner.nextLine();
+        }
+        if (answer.equalsIgnoreCase("Y")){
+            // Do websocket resign
+            // Do game over
+            System.out.println("Player has resigned"); // Replace this with WebSocket later.
+        } else {
+            System.out.println("Did not resign");
+        }
+
+
     }
 
     private void handleMoveCommand(String arguments) {
     }
 
     private void handleLeaveCommand() {
+        // Do stuff with the friggin WebSocket
+        state = State.SIGNEDIN;
     }
 
     private void handleRedrawCommand() {
+        //server.printGame();
     }
 
     private void printPlayingHelp() {
+        System.out.println(blueText + "help" + resetText + " - Show possible commands");
+        System.out.println(blueText + "redraw" + resetText + " - Redraws the chess board");
+        System.out.println(blueText + "leave" + resetText + " - Leaves the current game");
+        System.out.println(blueText + "move " + yellowText + "<FROM> <TO>" + resetText + " - Makes a move (e.g., move e2 e4)");
+        System.out.println(blueText + "resign" + resetText + " - Resigns from the game");
+        System.out.println(blueText + "moves " + yellowText + "<PIECE>" + resetText + " - Highlights legal moves for a piece");
     }
 
     // Handle the quit command
@@ -210,9 +246,9 @@ public class ChessClient {
 
     private void printSignedOutHelp(){
         System.out.println(blueText + "register " + yellowText + "<USERNAME> <PASSWORD> <EMAIL>" +
-        EscapeSequences.RESET_TEXT_COLOR + " - account creation");
+        resetText + " - account creation");
         System.out.println(blueText + "login " + yellowText + "<USERNAME> <PASSWORD>" +
-        EscapeSequences.RESET_TEXT_COLOR + " - to play chess");
+        resetText + " - to play chess");
         System.out.println(blueText + "quit" + resetText + " - quit playing chess");
         System.out.println(blueText + "help" + resetText + " - Show possible commands");
     }
