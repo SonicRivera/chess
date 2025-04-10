@@ -177,7 +177,7 @@ public class WebSocketHandler {
         }
     }
 
-    private void handleLeave(UserGameCommand command, Session session) throws IOException {
+    private void handleLeave(Leave command, Session session) throws IOException {
         try {
             AuthData auth = Server.userService.getAuth(command.getAuthToken());
             GameData game = Server.gameService.getGameData(command.getAuthToken(), command.getGameID());
@@ -203,9 +203,44 @@ public class WebSocketHandler {
         }
     }
 
-    private void handleResign(UserGameCommand command, Session session) {
-        System.out.println("Handling RESIGN");
-        // Notify all clients and mark game as over
+    private void handleResign(Resign command, Session session) throws IOException {
+        ChessGame.TeamColor color;
+        try {
+            AuthData auth = Server.userService.getAuth(command.getAuthToken());
+            GameData game = Server.gameService.getGameData(command.getAuthToken(), command.getGameID());
+            // Determine if the user is a player or observer
+            boolean isWhitePlayer = Objects.equals(game.whiteUsername(), auth.username());
+            boolean isBlackPlayer = Objects.equals(game.blackUsername(), auth.username());
+
+            if (isWhitePlayer){
+                color = ChessGame.TeamColor.WHITE;
+            } else if (isBlackPlayer){
+                color = ChessGame.TeamColor.BLACK;
+            } else {
+                color = null;
+            }
+
+            String opponentUsername = color == ChessGame.TeamColor.WHITE ? game.blackUsername() : game.whiteUsername();
+
+            if (color == null) {
+                sendError(session, new Error("Error: You are observing this game"));
+                return;
+            }
+
+            if (game.game().getGameOver()) {
+                sendError(session, new Error("Error: The game is already over!"));
+                return;
+            }
+
+            game.game().setGameOver(true);
+            Server.gameService.updateGame(game);
+            Notification notif = new Notification("%s has forfeited, %s wins!".formatted(auth.username(), opponentUsername));
+            broadcastMessage(session, notif, true);
+        } catch (DataAccessException e) {
+            sendError(session, new Error("Error: Unauthorized"));
+        } catch (Exception e) {
+            sendError(session, new Error("Error: Something went wrong"));
+        }
     }
 
     // Send notification to all clients on current game except user
