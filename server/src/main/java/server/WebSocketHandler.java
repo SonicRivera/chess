@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import com.google.gson.JsonParser;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
@@ -112,9 +113,28 @@ public class WebSocketHandler {
         // Validate move, update game state, and notify clients
     }
 
-    private void handleLeave(UserGameCommand command, Session session) {
-        System.out.println("Handling LEAVE");
-        // Notify other clients
+    private void handleLeave(UserGameCommand command, Session session) throws IOException {
+        try {
+            AuthData auth = Server.userService.getAuth(command.getAuthToken());
+            GameData game = Server.gameService.getGameData(command.getAuthToken(), command.getGameID());
+    
+            // Update game state to free the player's spot
+            if (game.whiteUsername().equals(auth.username())) {
+                game = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(),game.game());
+            } else if (game.blackUsername().equals(auth.username())) {
+                game = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(),game.game());
+            }
+    
+            // Persist the updated game state to the database
+            Server.gameService.updateGame(game);
+    
+            // Notify other players
+            Notification notif = new Notification("%s has left the game".formatted(auth.username()));
+            broadcastMessage(session, notif);
+            session.close();
+        } catch (Exception e) {
+            sendError(session, new Error("Error: Not authorized"));
+        }
     }
 
     private void handleResign(UserGameCommand command, Session session) {

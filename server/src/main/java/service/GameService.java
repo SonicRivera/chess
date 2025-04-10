@@ -112,4 +112,9 @@ public class GameService {
             throw new DataAccessException("400: Bad Request");
         }
     }
+
+    public void updateGame(GameData data) throws DataAccessException {
+        gameDAO.updateGame(data);
+
+    }
 }
