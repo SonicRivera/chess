@@ -1,6 +1,8 @@
 package server;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -135,12 +137,13 @@ public class WebSocketHandler {
             }
 
             if (game.game().getGameOver()) {
-                sendError(session, new Error("ERROR: can not make a move, game is over"));
+                sendError(session, new Error("ERROR: can't make move, game is over"));
                 return;
             }
 
             if (game.game().getTeamTurn().equals(color)) {
-                game.game().makeMove(command.getMove());
+                ChessMove move = command.getMove();
+                game.game().makeMove(move);
 
                 Notification notif;
                 Notification statusNotif = null;
@@ -169,7 +172,9 @@ public class WebSocketHandler {
                     broadcastMessage(session, statusNotif, true);
                 }
 
-                notif = new Notification("A move has been made by %s".formatted(auth.username()));
+                notif = new Notification("%s moved %s to %s".formatted(auth.username(),
+                        posToString(move.getStartPosition()), posToString(move.getEndPosition())));
+
                 broadcastMessage(session, notif);
 
             }
@@ -182,6 +187,17 @@ public class WebSocketHandler {
         } catch (Exception e) {
             sendError(session, new Error("ERROR: Something went wrong"));
         }
+    }
+
+    private String posToString(ChessPosition pos) {
+        // Convert the column to a letter (a-h)
+        char column = (char) ('a' + pos.getColumn() - 1);
+    
+        // Convert the row
+        int row = pos.getRow();
+    
+        // Combine
+        return String.format("%c%d", column, row);
     }
 
     private void handleLeave(Leave command, Session session) throws IOException {
