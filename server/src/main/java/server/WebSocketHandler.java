@@ -64,7 +64,7 @@ public class WebSocketHandler {
             break;
         default:
             System.err.println("Unknown commandType: " + commandType);
-            sendError(session, new Error("Unknown commandType: " + commandType));
+            sendError(session, new Error("ERROR: Unknown commandType: " + commandType));
             break;
     }
     }
@@ -105,7 +105,7 @@ public class WebSocketHandler {
             LoadGame load = new LoadGame(game.game());
             sendMessage(session, load);
         } catch (Exception e) {
-            sendError(session, new Error("Error: Not authorized"));
+            sendError(session, new Error("ERROR: Not authorized"));
         }
     }
 
@@ -130,12 +130,12 @@ public class WebSocketHandler {
 
 
             if (color == null) {
-                sendError(session, new Error("Error: You are observing this game"));
+                sendError(session, new Error("ERROR: You are observing this game"));
                 return;
             }
 
             if (game.game().getGameOver()) {
-                sendError(session, new Error("Error: can not make a move, game is over"));
+                sendError(session, new Error("ERROR: can not make a move, game is over"));
                 return;
             }
 
@@ -167,13 +167,13 @@ public class WebSocketHandler {
                 broadcastMessage(session, load, true);
             }
             else {
-                sendError(session, new Error("Error: it is not your turn"));
+                sendError(session, new Error("ERROR: it is not your turn"));
             }
         } catch (InvalidMoveException e) {
             System.out.println("Error: " + e.getMessage() + "  " + command.getMove().toString());
-            sendError(session, new Error("Error: invalid move (you might need to specify a promotion piece)"));
+            sendError(session, new Error("ERROR: Invalid move"));
         } catch (Exception e) {
-            sendError(session, new Error("Error: Something went wrong"));
+            sendError(session, new Error("ERROR: Something went wrong"));
         }
     }
 
@@ -183,15 +183,14 @@ public class WebSocketHandler {
             GameData game = Server.gameService.getGameData(command.getAuthToken(), command.getGameID());
     
             // Update game state to free the player's spot
-            if (game.whiteUsername() != null && game.blackUsername() != null){
-                if (game.whiteUsername().equals(auth.username())) {
+
+                if (!(game.whiteUsername() == null) && game.whiteUsername().equals(auth.username())) {
                     game = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(),game.game());
-                } else if (game.blackUsername().equals(auth.username())) {
+                } else if (!(game.blackUsername() == null) && game.blackUsername().equals(auth.username())) {
                     game = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(),game.game());
                 }
                 // Persist the updated game state to the database
                 Server.gameService.updateGame(game);
-            }
 
 
             // Notify other players
@@ -199,7 +198,7 @@ public class WebSocketHandler {
             broadcastMessage(session, notif);
             session.close();
         } catch (Exception e) {
-            sendError(session, new Error("Error: Not authorized"));
+            sendError(session, new Error("ERROR: Not authorized"));
         }
     }
 
@@ -223,12 +222,12 @@ public class WebSocketHandler {
             String opponentUsername = color == ChessGame.TeamColor.WHITE ? game.blackUsername() : game.whiteUsername();
 
             if (color == null) {
-                sendError(session, new Error("Error: You are observing this game"));
+                sendError(session, new Error("ERROR: You are observing this game"));
                 return;
             }
 
             if (game.game().getGameOver()) {
-                sendError(session, new Error("Error: The game is already over!"));
+                sendError(session, new Error("ERROR: The game is already over!"));
                 return;
             }
 
@@ -237,9 +236,9 @@ public class WebSocketHandler {
             Notification notif = new Notification("%s has forfeited, %s wins!".formatted(auth.username(), opponentUsername));
             broadcastMessage(session, notif, true);
         } catch (DataAccessException e) {
-            sendError(session, new Error("Error: Unauthorized"));
+            sendError(session, new Error("ERROR: Unauthorized"));
         } catch (Exception e) {
-            sendError(session, new Error("Error: Something went wrong"));
+            sendError(session, new Error("ERROR: Something went wrong"));
         }
     }
 

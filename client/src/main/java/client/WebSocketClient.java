@@ -3,9 +3,11 @@ package client;
 import com.google.gson.Gson;
 
 import chess.ChessGame;
+import ui.ChessClient;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
+import websocket.messages.Error;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -14,14 +16,15 @@ import java.net.URISyntaxException;
 
 public class WebSocketClient extends Endpoint {
     private Session session;
+    private ChessClient chessClient;
 
-    public WebSocketClient(String serverDomain) throws Exception {
+    public WebSocketClient(String serverDomain, ChessClient client) throws Exception {
+        this.chessClient = client;
         try {
             URI uri = new URI("ws://" + serverDomain + "/ws");
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, uri);
-            System.out.println("Connected to WebSocket server"); // Delete later
 
             // Set message handler
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
@@ -58,9 +61,8 @@ public class WebSocketClient extends Endpoint {
     }
 
     private void printLoadedGame(ChessGame game) {
-        System.out.println("\n[LOAD_GAME] Game state updated:");
-        ServerFacade.printGame(game.getBoard(), true);
-        System.out.print("\u001B[38;5;160m[In Game] \u001B[0m >>> ");
+        System.out.println();
+        chessClient.printGame(game.getBoard());
     }
 
     public void sendMessage(String message) {

@@ -244,8 +244,6 @@ public class ServerFacade {
             // Read the response
             int responseCode = connection.getResponseCode();
             if (responseCode == 200) {
-                System.out.println("COLOR IS: " + color); // Remove when completed
-
                 if (color.equals("WHITE")){
                     ChessGame chessGame = gameList.get(gameKey);
                     data.put("bool", true);
@@ -357,33 +355,7 @@ public class ServerFacade {
         return data;
     }
 
-    public static void printGame(ChessBoard board, boolean white){
-        String color;
-        String columnLabels = white ? "\u001b[100m a  b  c  d  e  f  g  h    \u001b[0m" : "\u001b[100m h  g  f  e  d  c  b  a    \u001b[0m";
-        System.out.println(columnLabels);
 
-        for (int i = (white ? 7 : 0); (white ? i >= 0 : i <= 7); i += (white ? -1 : 1)) {
-                for (int j = (white ? 0 : 7); (white ? j < 8 : j >= 0); j+= (white ? 1 : -1)) {
-                    if ((i + j) % 2 == 0){
-                        color = "\u001b[100m";
-                    } else {
-                        color = "\u001b[47m";
-                    }
-
-
-                    ChessPiece piece = board.board[i][j];
-                    if (piece == null) {
-                        System.out.print(color + "   " + "\u001b[0m");
-                    } else {
-                        System.out.print(color + piece.getSymbol() + "\u001b[0m");
-                    }
-                }
-                System.out.println("\u001b[100m " + (i + 1) + " \u001b[0m");
-            }
-
-            System.out.println(columnLabels);
-            System.out.println();
-        }
 
 
 

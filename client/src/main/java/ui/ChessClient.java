@@ -1,8 +1,7 @@
 package ui;
 
 
-import chess.ChessGame;
-import chess.ChessMove;
+import chess.*;
 import client.ServerFacade;
 import client.WebSocketClient;
 import com.google.gson.Gson;
@@ -24,6 +23,7 @@ public class ChessClient {
     ChessGame chessGame;
     WebSocketClient ws;
     int dbGameID;
+    boolean playerColor;
 
 
 
@@ -211,9 +211,7 @@ public class ChessClient {
             answer = scanner.nextLine();
         }
         if (answer.equalsIgnoreCase("Y")){
-            // Do websocket resign
-            // Do game over
-            System.out.println("Player has resigned"); // Replace this with WebSocket later.
+            resign(dbGameID);
         } else {
             System.out.println("Did not resign");
         }
@@ -222,6 +220,39 @@ public class ChessClient {
     }
 
     private void handleMoveCommand(String arguments) {
+        String[] movArgs = arguments.split("\\s+");
+        if (movArgs.length >= 2 && movArgs[0].matches("[a-h][1-8]") && movArgs[1].matches("[a-h][1-8]")) {
+            ChessPosition from = new ChessPosition(movArgs[0].charAt(1) - '0', movArgs[0].charAt(0) - ('a'-1));
+            ChessPosition to = new ChessPosition(movArgs[1].charAt(1) - '0',movArgs[1].charAt(0) - ('a'-1));
+
+            ChessPiece.PieceType promotion = null;
+            if (movArgs.length == 3) {
+                promotion = getPieceType(movArgs[2]);
+                if (promotion == null) {
+                    System.out.println("Invalid promotion piece name (ex: 'knight')");
+                    System.out.println(blueText + "move " + yellowText + "<FROM> <TO> [PROMOTION PIECE]" + resetText +
+                            " - Makes a move (e.g., move e2 e4) and selects promotion piece (if necessary)");
+                }
+            }
+
+            makeMove(dbGameID, new ChessMove(from, to, promotion));
+        }
+        else {
+            System.out.println("Please provide a to and from coordinate (ex: 'c3 d5')");
+            System.out.println(blueText + "move " + yellowText + "<FROM> <TO> [PROMOTION PIECE]" + resetText +
+                    " - Makes a move (e.g., move e2 e4) and selects promotion piece (if necessary)");
+        }
+    }
+
+    private ChessPiece.PieceType getPieceType(String name) {
+        return switch (name.toUpperCase()) {
+            case "QUEEN" -> ChessPiece.PieceType.QUEEN;
+            case "BISHOP" -> ChessPiece.PieceType.BISHOP;
+            case "KNIGHT" -> ChessPiece.PieceType.KNIGHT;
+            case "ROOK" -> ChessPiece.PieceType.ROOK;
+            case "PAWN" -> ChessPiece.PieceType.PAWN;
+            default -> null;
+        };
     }
 
     private void handleLeaveCommand() {
@@ -237,7 +268,9 @@ public class ChessClient {
         System.out.println(blueText + "help" + resetText + " - Show possible commands");
         System.out.println(blueText + "redraw" + resetText + " - Redraws the chess board");
         System.out.println(blueText + "leave" + resetText + " - Leaves the current game");
-        System.out.println(blueText + "move " + yellowText + "<FROM> <TO>" + resetText + " - Makes a move (e.g., move e2 e4)");
+        System.out.println(blueText + "move " + yellowText + "<FROM> <TO> [PROMOTION PIECE]" + resetText +
+                " - Makes a move (e.g., move e2 e4) and selects promotion piece (if necessary)");
+
         System.out.println(blueText + "resign" + resetText + " - Resigns from the game");
         System.out.println(blueText + "moves " + yellowText + "<PIECE>" + resetText + " - Highlights legal moves for a piece");
     }
@@ -348,9 +381,14 @@ public class ChessClient {
             state = State.PLAYING;
             chessGame = (ChessGame) data.get("chessGame");
             dbGameID = Integer.parseInt(data.get("gameID").toString());
+            playerColor = getPlayerColor(data);
             connectWS();
             joinPlayer(dbGameID);
         }
+    }
+
+    private boolean getPlayerColor(Map<String, Object> data){
+        return (Boolean) data.get("color");
     }
 
     private void handleObserveCommand(String arguments){
@@ -363,7 +401,8 @@ public class ChessClient {
             Map<String, Object> data = server.observeGame(observeArgs[0]);
             dbGameID = Integer.parseInt(data.get("gameID").toString());
             chessGame = (ChessGame) data.get("chessGame");
-            server.printGame(chessGame.getBoard(), true);
+            playerColor = true;
+            printGame(chessGame.getBoard());
             joinObserver(dbGameID);
 
 
@@ -372,7 +411,7 @@ public class ChessClient {
 
     public void connectWS() {
         try {
-            ws = new WebSocketClient(serverURL);
+            ws = new WebSocketClient(serverURL, this);
         }
         catch (Exception e) {
             System.out.println("Failed to make connection with server");
@@ -402,6 +441,36 @@ public class ChessClient {
 
     public void resign(int gameID) {
         sendCommand(new Resign(authToken, gameID));
+    }
+
+    public void printGame(ChessBoard board){
+        
+        
+        String color;
+        String columnLabels = playerColor ? "\u001b[100m a  b  c  d  e  f  g  h    \u001b[0m" : "\u001b[100m h  g  f  e  d  c  b  a    \u001b[0m";
+        System.out.println(columnLabels);
+
+        for (int i = (playerColor ? 7 : 0); (playerColor ? i >= 0 : i <= 7); i += (playerColor ? -1 : 1)) {
+            for (int j = (playerColor ? 0 : 7); (playerColor ? j < 8 : j >= 0); j+= (playerColor ? 1 : -1)) {
+                if ((i + j) % 2 == 0){
+                    color = "\u001b[100m";
+                } else {
+                    color = "\u001b[47m";
+                }
+
+
+                ChessPiece piece = board.board[i][j];
+                if (piece == null) {
+                    System.out.print(color + "   " + "\u001b[0m");
+                } else {
+                    System.out.print(color + piece.getSymbol() + "\u001b[0m");
+                }
+            }
+            System.out.println("\u001b[100m " + (i + 1) + " \u001b[0m");
+        }
+
+        System.out.println(columnLabels);
+        System.out.println();
     }
 
 
