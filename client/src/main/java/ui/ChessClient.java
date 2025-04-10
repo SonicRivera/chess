@@ -20,7 +20,7 @@ public class ChessClient {
     public State state = State.SIGNEDOUT;
     private String authToken = null;
     private String serverURL;
-    ChessGame chessGame;
+    public ChessGame chessGame;
     WebSocketClient ws;
     int dbGameID;
     boolean playerColor;
@@ -261,7 +261,7 @@ public class ChessClient {
     }
 
     private void handleRedrawCommand() {
-        //server.printGame();
+        printGame(chessGame.getBoard());
     }
 
     private void printPlayingHelp() {

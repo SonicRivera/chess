@@ -62,6 +62,7 @@ public class WebSocketClient extends Endpoint {
 
     private void printLoadedGame(ChessGame game) {
         System.out.println();
+        chessClient.chessGame = game;
         chessClient.printGame(game.getBoard());
     }
 
