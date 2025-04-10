@@ -143,28 +143,34 @@ public class WebSocketHandler {
                 game.game().makeMove(command.getMove());
 
                 Notification notif;
+                Notification statusNotif = null;
                 ChessGame.TeamColor opponentColor = color == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
 
                 if (game.game().isInCheckmate(opponentColor)) {
-                    notif = new Notification("Checkmate! %s wins!".formatted(auth.username()));
+                    statusNotif = new Notification("Checkmate! %s wins!".formatted(auth.username()));
                     game.game().setGameOver(true);
+
                 }
                 else if (game.game().isInStalemate(opponentColor)) {
-                    notif = new Notification("Stalemate caused by %s's move! It's a tie!".formatted(auth.username()));
+                    statusNotif = new Notification("Stalemate caused by %s's move! It's a tie!".formatted(auth.username()));
                     game.game().setGameOver(true);
                 }
                 else if (game.game().isInCheck(opponentColor)) {
-                    notif = new Notification("A move has been made by %s, %s is now in check!".formatted(auth.username(), opponentColor.toString()));
+                    statusNotif = new Notification("A move has been made by %s, %s is now in check!".formatted(auth.username(), opponentColor.toString()));
                 }
-                else {
-                    notif = new Notification("A move has been made by %s".formatted(auth.username()));
-                }
-                broadcastMessage(session, notif);
 
                 Server.gameService.updateGame(game);
 
                 LoadGame load = new LoadGame(game.game());
                 broadcastMessage(session, load, true);
+
+                if (statusNotif != null){
+                    broadcastMessage(session, statusNotif, true);
+                }
+
+                notif = new Notification("A move has been made by %s".formatted(auth.username()));
+                broadcastMessage(session, notif);
+
             }
             else {
                 sendError(session, new Error("ERROR: it is not your turn"));
