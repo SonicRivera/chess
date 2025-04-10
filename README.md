@@ -56,15 +56,15 @@ https://sequencediagram.org/index.html?presentationMode=readOnly#initialData=IYY
 )
 
 ## TODO
-- [ ] Join game state UI
-- [ ] Obesrve game state UI
-- [ ] Help Text
-- [ ] Observer Connect: Observers can connect to a game. Notification sent and board drawn.
-- [ ] Observer Leave Game: Observers can leave games. Notification sent.
-- [ ] Player Connect: Players can connect to a game as a specified color. Notification sent and board drawn.
-- [ ] Player Move Piece: Players can move pieces. Illegal moves rejected. Notification sent (including check or checkmate notification if applicable) and board drawn.
-- [ ] Player Leave Game: Players can leave games. Notification sent.
+- [x] Join game state UI
+- [x] Obesrve game state UI
+- [x] Help Text
+- [x] Observer Connect: Observers can connect to a game. Notification sent and board drawn.
+- [x] Observer Leave Game: Observers can leave games. Notification sent.
+- [x] Player Connect: Players can connect to a game as a specified color. Notification sent and board drawn.
+- [x] Player Move Piece: Players can move pieces. Illegal moves rejected. Notification sent (including check or checkmate notification if applicable) and board drawn.
+- [x] Player Leave Game: Players can leave games. Notification sent.
 - [ ] Player Resign Game: Players can resign from games. Notification sent.
 - [ ] Display Legal Moves: Any player or observer can display the legal moves available to any piece on the board regardless of whose turn it is.
 - [ ] Redraw Board: The board redraws when requested by the user (player or observer).
-- [ ] Game completion: No moves after game completion due to resignation, checkmate, or stalemate.
+- [x] Game completion: No moves after game completion due to resignation, checkmate, or stalemate.
