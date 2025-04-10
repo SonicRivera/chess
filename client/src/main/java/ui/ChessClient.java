@@ -220,7 +220,52 @@ public class ChessClient {
     Collection<ChessMove> legalMoves = chessGame.validMoves(position);
 
     // Highlight the piece's current square and legal moves
-//    highlightLegalMoves(position, legalMoves);
+    highlightLegalMoves(position, legalMoves);
+    }
+
+    private void highlightLegalMoves(ChessPosition position, Collection<ChessMove> legalMoves) {
+        ChessBoard board = chessGame.getBoard();
+        String color;
+
+        String columnLabels = playerColor ? "\u001b[100m a  b  c  d  e  f  g  h    \u001b[0m" : "\u001b[100m h  g  f  e  d  c  b  a    \u001b[0m";
+        System.out.println(columnLabels);
+
+        for (int i = (playerColor ? 7 : 0); (playerColor ? i >= 0 : i <= 7); i += (playerColor ? -1 : 1)) {
+            for (int j = (playerColor ? 0 : 7); (playerColor ? j < 8 : j >= 0); j += (playerColor ? 1 : -1)) {
+                if ((i + j) % 2 == 0) {
+                    color = "\u001b[100m";
+                } else {
+                    color = "\u001b[47m";
+                }
+
+                ChessPiece piece = board.board[i][j];
+                ChessPosition currentPosition = new ChessPosition(i+1, j+1);
+
+                // Highlight the current square of the selected piece
+                if (currentPosition.equals(position)) {
+                    System.out.print("\u001b[43m" + (piece != null ? piece.getSymbol() : "   ") + "\u001b[0m");
+                }
+                // Highlight legal moves
+                else if (checkMoves(currentPosition, legalMoves)) {
+                    System.out.print("\u001b[42m" + (piece != null ? piece.getSymbol() : "   ") + "\u001b[0m");
+                } else {
+                    System.out.print(color + (piece != null ? piece.getSymbol() : "   ") + "\u001b[0m");
+                }
+            }
+            System.out.println("\u001b[100m " + (i + 1) + " \u001b[0m");
+        }
+
+        System.out.println(columnLabels);
+        System.out.println();
+    }
+
+    private boolean checkMoves(ChessPosition position, Collection<ChessMove> legalMoves){
+        for (ChessMove move : legalMoves){
+            if (position.equals(move.getEndPosition())){
+                return true;
+            }
+        }
+        return false;
     }
 
     private void handleResignCommand() {
