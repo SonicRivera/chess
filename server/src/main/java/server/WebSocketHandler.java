@@ -18,6 +18,7 @@ import websocket.commands.*;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
+import websocket.messages.Error;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -85,29 +86,23 @@ public class WebSocketHandler {
             AuthData auth = Server.userService.getAuth(command.getAuthToken());
             GameData game = Server.gameService.getGameData(command.getAuthToken(), command.getGameID());
 
-            ChessGame.TeamColor joiningColor = command.getColor().toString().equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+            // Determine if the user is a player or observer
+            boolean isWhitePlayer = Objects.equals(game.whiteUsername(), auth.username());
+            boolean isBlackPlayer = Objects.equals(game.blackUsername(), auth.username());
 
-            boolean correctColor;
-            if (joiningColor == ChessGame.TeamColor.WHITE) {
-                correctColor = Objects.equals(game.whiteUsername(), auth.username());
-            }
-            else {
-                correctColor = Objects.equals(game.blackUsername(), auth.username());
-            }
-
-            if (!correctColor) {
-                Error error = new Error("Error: attempting to join with wrong color");
-                sendError(session, error);
-                return;
+            if (isWhitePlayer || isBlackPlayer) {
+                String color = isWhitePlayer ? "WHITE" : "BLACK";
+                Notification notif = new Notification("%s has joined the game as %s".formatted(auth.username(), color));
+                broadcastMessage(session, notif);
+            } else {
+                Notification notif = new Notification("%s has joined the game as an OBSERVER".formatted(auth.username()));
+                broadcastMessage(session, notif);
             }
 
-            Notification notif = new Notification("%s has joined the game as %s".formatted(auth.username(), command.getColor().toString()));
-            broadcastMessage(session, notif);
-
+            // Send the game state to the connecting user
             LoadGame load = new LoadGame(game.game());
             sendMessage(session, load);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             sendError(session, new Error("Error: Not authorized"));
         }
     }

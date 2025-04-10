@@ -342,16 +342,14 @@ public class ChessClient {
 
         Map<String, Object> data = server.joinGame(gameId, color, authToken);
         Boolean success = (Boolean) data.get("bool");
-        Boolean team = (Boolean) data.get("color");
 
 
         if (success) {
             state = State.PLAYING;
             chessGame = (ChessGame) data.get("chessGame");
             dbGameID = Integer.parseInt(data.get("gameID").toString());
-//            server.printGame(chessGame.getBoard(), team);
             connectWS();
-            joinPlayer(dbGameID, team);
+            joinPlayer(dbGameID);
         }
     }
 
@@ -386,12 +384,12 @@ public class ChessClient {
         ws.sendMessage(message);
     }
 
-    public void joinPlayer(int gameID, boolean color) {
-        sendCommand(new Connect(authToken, gameID, color));
+    public void joinPlayer(int gameID) {
+        sendCommand(new Connect(authToken, gameID));
     }
 
     public void joinObserver(int gameID) {
-        sendCommand(new Connect(authToken, gameID, true));
+        sendCommand(new Connect(authToken, gameID));
     }
 
     public void makeMove(int gameID, ChessMove move) {
