@@ -183,15 +183,17 @@ public class WebSocketHandler {
             GameData game = Server.gameService.getGameData(command.getAuthToken(), command.getGameID());
     
             // Update game state to free the player's spot
-            if (game.whiteUsername().equals(auth.username())) {
-                game = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(),game.game());
-            } else if (game.blackUsername().equals(auth.username())) {
-                game = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(),game.game());
+            if (game.whiteUsername() != null && game.blackUsername() != null){
+                if (game.whiteUsername().equals(auth.username())) {
+                    game = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(),game.game());
+                } else if (game.blackUsername().equals(auth.username())) {
+                    game = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(),game.game());
+                }
+                // Persist the updated game state to the database
+                Server.gameService.updateGame(game);
             }
-    
-            // Persist the updated game state to the database
-            Server.gameService.updateGame(game);
-    
+
+
             // Notify other players
             Notification notif = new Notification("%s has left the game".formatted(auth.username()));
             broadcastMessage(session, notif);
