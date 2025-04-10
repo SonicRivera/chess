@@ -60,6 +60,7 @@ public class WebSocketClient extends Endpoint {
     private void printLoadedGame(ChessGame game) {
         System.out.println("\n[LOAD_GAME] Game state updated:");
         ServerFacade.printGame(game.getBoard(), true);
+        System.out.print("\u001B[38;5;160m[In Game] \u001B[0m >>> ");
     }
 
     public void sendMessage(String message) {
