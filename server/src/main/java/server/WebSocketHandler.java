@@ -156,7 +156,8 @@ public class WebSocketHandler {
                     game.game().setGameOver(true);
                 }
                 else if (game.game().isInCheck(opponentColor)) {
-                    statusNotif = new Notification("A move has been made by %s, %s is now in check!".formatted(auth.username(), opponentColor.toString()));
+                    statusNotif = new Notification(("A move has been made " +
+                            "by %s, %s is now in check!").formatted(auth.username(), opponentColor.toString()));
                 }
 
                 Server.gameService.updateGame(game);
