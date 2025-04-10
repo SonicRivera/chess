@@ -5,11 +5,8 @@ import chess.*;
 import client.ServerFacade;
 import client.WebSocketClient;
 import com.google.gson.Gson;
-import websocket.commands.UserGameCommand;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 
 import websocket.commands.*;
@@ -162,7 +159,7 @@ public class ChessClient {
                 handleResignCommand();
                 break;
             case "moves":
-                handleLegalMovesCommand();
+                handleLegalMovesCommand(arguments);
                 break;
             default:
                 handleUnknownCommand();
@@ -185,7 +182,7 @@ public class ChessClient {
                 handleLeaveCommand();
                 break;
             case "moves":
-                handleLegalMovesCommand();
+                handleLegalMovesCommand(arguments);
                 break;
             default:
                 handleUnknownCommand();
@@ -199,7 +196,31 @@ public class ChessClient {
         System.out.println(blueText + "moves " + yellowText + "<PIECE>" + resetText + " - Highlights legal moves for a piece");
     }
 
-    private void handleLegalMovesCommand() {
+    private void handleLegalMovesCommand(String argument) {
+        // Validate input
+    if (!argument.matches("[a-h][1-8]")) {
+        System.out.println("Invalid input. Please enter a valid position (e.g., e2).");
+        return;
+    }
+
+    // Convert input to ChessPosition
+    int row = argument.charAt(1) - '0';
+    int col = argument.charAt(0) - ('a'-1);
+    ChessPosition position = new ChessPosition(row, col);
+
+    // Get the piece at the specified position
+    ChessPiece piece = chessGame.getBoard().board[row - 1][col - 1];
+    if (piece == null) {
+        System.out.println("No piece found at the specified position.");
+        return;
+    }
+
+
+    // Get legal moves for the piece
+    Collection<ChessMove> legalMoves = chessGame.validMoves(position);
+
+    // Highlight the piece's current square and legal moves
+//    highlightLegalMoves(position, legalMoves);
     }
 
     private void handleResignCommand() {
