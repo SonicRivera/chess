@@ -2,8 +2,11 @@ package server;
 
 import spark.*;
 import service.UserService;
+import org.eclipse.jetty.websocket.api.Session;
 import service.GameService;
 import dataaccess.*;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
 
@@ -16,6 +19,8 @@ public class Server {
 
     UserHandler userHandler;
     GameHandler gameHandler;
+    WebSocketHandler webSocketHandler;
+    static ConcurrentHashMap<Session, Integer> gameSessions = new ConcurrentHashMap<>();
 
     public Server() {
     }
@@ -31,12 +36,13 @@ public class Server {
 
         userHandler = new UserHandler(userService);
         gameHandler = new GameHandler(gameService);
+        webSocketHandler = new WebSocketHandler();
 
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
 
-        Spark.webSocket("/ws", WebSocketHandler.class);
+        Spark.webSocket("/ws", webSocketHandler);
 
         // User Endpoints
         Spark.delete("/db", this::clear);

@@ -37,8 +37,6 @@ public class WebSocketClient extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
-        this.session = session;
-        System.out.println("WebSocket connection opened.");  // Remove for production
     }
 
     private void handleMessage(String message) {
@@ -64,26 +62,6 @@ public class WebSocketClient extends Endpoint {
     }
 
     public void sendMessage(String message) {
-        if (this.session != null && this.session.isOpen()) {
             this.session.getAsyncRemote().sendText(message);
-        } else {
-            System.err.println("WebSocket session is not open. Cannot send message.");
-        }
-    }
-
-    public void sendConnectCommand(String authToken, int gameID) {
-        UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
-        String jsonCommand = new Gson().toJson(connectCommand);
-        sendMessage(jsonCommand);
-    }
-
-    public void close() {
-        try {
-            if (this.session != null) {
-                this.session.close();
-            }
-        } catch (IOException e) {
-            System.out.println("Something went wrong when closing.");;
-        }
     }
 }

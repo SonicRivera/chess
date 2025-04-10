@@ -244,7 +244,9 @@ public class ServerFacade {
                 System.out.println("COLOR IS: " + color); // Remove when completed
                 if (color.equals("WHITE")){
                     try {
+                        int wsGameId = Integer.parseInt(gameList.get(game - 1));
                         ws = new WebSocketClient(serverUrl);
+//                        ws.sendConnectCommand(sessionToken,wsGameId);
                     } catch (Exception e) {
                         System.out.println("Failed to connect to WebSocket.");
                     }
