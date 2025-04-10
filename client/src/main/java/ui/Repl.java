@@ -25,8 +25,12 @@ public class Repl {
 
             if (client.state == State.SIGNEDOUT){
                 prefix = redText + "[Logged Out] " + resetText + " >>> ";
-            } else {
+            } else if (client.state == State.SIGNEDIN) {
                 prefix = redText + "[Logged In] " + resetText + " >>> ";
+            } else if (client.state == State.PLAYING) {
+                prefix = redText + "[In Game] " + resetText + " >>> ";
+            } else {
+                prefix = redText + "[Observing] " + resetText + " >>> ";
             }
             System.out.print(prefix);
             command = scanner.nextLine();

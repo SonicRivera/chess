@@ -1,22 +1,28 @@
 package ui;
 
 
-import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
 import client.ServerFacade;
 import client.WebSocketClient;
+import com.google.gson.Gson;
+import websocket.commands.UserGameCommand;
 
 import java.util.Map;
 import java.util.Scanner;
+
+
+import websocket.commands.*;
 
 public class ChessClient {
 
     private final ServerFacade server;
     public State state = State.SIGNEDOUT;
-    private String sessionToken = null;
+    private String authToken = null;
     private String serverURL;
     ChessGame chessGame;
-    int gameId;
+    WebSocketClient ws;
+
 
 
     // Colors
@@ -119,7 +125,7 @@ public class ChessClient {
                 handleCreateCommand(arguments);
                 break;
             case "list":
-                server.listGames(sessionToken);
+                server.listGames(authToken);
                 break;
             case "join":
                 handleJoinCommand(arguments);
@@ -270,10 +276,10 @@ public class ChessClient {
         } else if (regArgs.length > 3) {
             System.out.println(redText + "Please only input a username, password, and an email.");
         } else {
-            sessionToken = server.register(regArgs);
-            if (!sessionToken.isEmpty()) {
+            authToken = server.register(regArgs);
+            if (!authToken.isEmpty()) {
                 state = State.SIGNEDIN;
-                server.listGames(sessionToken);
+                server.listGames(authToken);
             }
         }
     }
@@ -285,10 +291,10 @@ public class ChessClient {
         } else if (loginArgs.length > 2) {
             System.out.println(redText + "Please only input a username and password.");
         } else {
-            sessionToken = server.login(loginArgs);
-            if (!sessionToken.isEmpty()){
+            authToken = server.login(loginArgs);
+            if (!authToken.isEmpty()){
                 state = state.SIGNEDIN;
-                server.listGames(sessionToken);
+                server.listGames(authToken);
             }
 
         }
@@ -296,8 +302,8 @@ public class ChessClient {
 
     private void handleLogoutCommand(){
         System.out.println(yellowText + "Logging out..." + resetText);
-        if(server.logout(sessionToken)){
-            sessionToken = null;
+        if(server.logout(authToken)){
+            authToken = null;
             state = State.SIGNEDOUT;
         }
     }
@@ -306,8 +312,8 @@ public class ChessClient {
         if (arguments.isEmpty()) {
             System.out.println(redText + "You must provide a game name." + resetText);
         } else {
-            server.createGame(arguments, sessionToken);
-            server.listGames(sessionToken);
+            server.createGame(arguments, authToken);
+            server.listGames(authToken);
         }
     }
 
@@ -332,11 +338,16 @@ public class ChessClient {
             return;
         }
 
-        Map<String, Object> data = server.joinGame(gameId, color, sessionToken);
+        Map<String, Object> data = server.joinGame(gameId, color, authToken);
         Boolean success = (Boolean) data.get("bool");
+        Boolean team = (Boolean) data.get("color");
 
         if (success) {
             state = State.PLAYING;
+            chessGame = (ChessGame) data.get("chessGame");
+            server.printGame(chessGame.getBoard(), team);
+            connectWS();
+            joinPlayer(Integer.parseInt(data.get("gameID").toString()), team);
         }
     }
 
@@ -346,9 +357,45 @@ public class ChessClient {
             System.out.println(redText + "Please specify the game ID to observe." + resetText);
         } else {
             server.observeGame(observeArgs[0]);
-             state = State.OBSERVING;
+            state = State.OBSERVING;
+            connectWS();
+
         }
     }
+
+    public void connectWS() {
+        try {
+            ws = new WebSocketClient(serverURL);
+        }
+        catch (Exception e) {
+            System.out.println("Failed to make connection with server");
+        }
+    }
+
+    public void sendCommand(UserGameCommand command) {
+        String message = new Gson().toJson(command);
+        ws.sendMessage(message);
+    }
+
+    public void joinPlayer(int gameID, boolean color) {
+        sendCommand(new Connect(authToken, gameID, color));
+    }
+
+    public void joinObserver(int gameID) {
+        sendCommand(new Connect(authToken, gameID, true));
+    }
+
+//    public void makeMove(int gameID, ChessMove move) {
+//        sendCommand(new MakeMove(authToken, gameID, move));
+//    }
+//
+//    public void leave(int gameID) {
+//        sendCommand(new Leave(authToken, gameID));
+//    }
+//
+//    public void resign(int gameID) {
+//        sendCommand(new Resign(authToken, gameID));
+//    }
 
 
 }

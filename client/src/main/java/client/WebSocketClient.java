@@ -21,6 +21,7 @@ public class WebSocketClient extends Endpoint {
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, uri);
+            System.out.println("Connected to WebSocket server"); // Delete later
 
             // Set message handler
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {

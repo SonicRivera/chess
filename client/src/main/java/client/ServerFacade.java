@@ -6,8 +6,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -16,18 +18,18 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import ui.EscapeSequences;
 
+
 public class ServerFacade {
 
-    private static String serverUrl;
-    private static ArrayList<String> gameList = new ArrayList<>(); // To store game IDs for selection
-    static WebSocketClient ws;
+    private String serverUrl;
+    private LinkedHashMap<String, ChessGame> gameList = new LinkedHashMap<>(); // To store gameID as key and ChessGame as value
 
 
     public ServerFacade(String url){
         serverUrl = url;
     }
 
-    public static String register(String[] info) {
+    public String register(String[] info) {
         try {
             String url = "http://" + serverUrl + "/user";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -74,7 +76,7 @@ public class ServerFacade {
     }
 
 
-    public static String login(String[] info) {
+    public String login(String[] info) {
         try {
             String url = "http://" + serverUrl + "/session";
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -121,7 +123,7 @@ public class ServerFacade {
         return "";
     }
 
-    public static boolean logout(String sessionToken) {
+    public boolean logout(String sessionToken) {
         try {
             if (sessionToken == null) {
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "No session token, please log in.");
@@ -156,7 +158,7 @@ public class ServerFacade {
     }
 
 
-    public static boolean createGame(String gameName, String sessionToken) {
+    public boolean createGame(String gameName, String sessionToken) {
         try {
 
             String url = "http://" + serverUrl + "/game";
@@ -196,7 +198,7 @@ public class ServerFacade {
 
     }
 
-    public static Map<String, Object> joinGame(String gameId, String color, String sessionToken) {
+    public Map<String, Object> joinGame(String gameId, String color, String sessionToken) {
         Map<String, Object> data = new HashMap<>();
 
         int game = Integer.parseInt(gameId);
@@ -230,7 +232,8 @@ public class ServerFacade {
 
             // Create JSON payload
 
-            String payload = String.format("{\"gameID\":\"%s\",\"playerColor\":\"%s\"}", gameList.get(game - 1), color);
+            String gameKey = new ArrayList<>(gameList.keySet()).get(game - 1);
+            String payload = String.format("{\"gameID\":\"%s\",\"playerColor\":\"%s\"}", gameKey, color);
     
             // Send the request
             try (OutputStream os = connection.getOutputStream()) {
@@ -242,28 +245,20 @@ public class ServerFacade {
             int responseCode = connection.getResponseCode();
             if (responseCode == 200) {
                 System.out.println("COLOR IS: " + color); // Remove when completed
+
                 if (color.equals("WHITE")){
-                    try {
-                        int wsGameId = Integer.parseInt(gameList.get(game - 1));
-                        ws = new WebSocketClient(serverUrl);
-//                        ws.sendConnectCommand(sessionToken,wsGameId);
-                    } catch (Exception e) {
-                        System.out.println("Failed to connect to WebSocket.");
-                    }
-                    ChessGame chessGame = new ChessGame();
-                    printGame(chessGame.getBoard(), true);
+                    ChessGame chessGame = gameList.get(gameKey);
                     data.put("bool", true);
                     data.put("chessGame", chessGame);
                     data.put("gameID", game);
-                    data.put("color", "white");
+                    data.put("color", true);
                     return data;
                 } else {
-                    ChessGame chessGame = new ChessGame();
-                    printGame(new ChessGame().getBoard(), false);
+                    ChessGame chessGame = gameList.get(gameKey);
                     data.put("bool", true);
                     data.put("chessGame", chessGame);
                     data.put("gameID", game);
-                    data.put("color", "black");
+                    data.put("color", false);
                     return data;
                 }
 
@@ -284,7 +279,7 @@ public class ServerFacade {
         return data;
     }
 
-    public static boolean listGames(String sessionToken) {
+    public boolean listGames(String sessionToken) {
         gameList.clear();
     
         try {
@@ -318,9 +313,10 @@ public class ServerFacade {
                     String gameName = game.get("gameName").getAsString();
                     String whitePlayer = game.has("whiteUsername") ? game.get("whiteUsername").getAsString() : "None";
                     String blackPlayer = game.has("blackUsername") ? game.get("blackUsername").getAsString() : "None";
+                    ChessGame gameData = new Gson().fromJson(game.get("chessGame").getAsString(), ChessGame.class);
     
                     // Add the game ID to the list
-                    gameList.add(gameId);
+                    gameList.put(gameId, gameData);
     
                     // Print the game details
                     System.out.printf("%d. %s (White: %s, Black: %s)%n", gameList.size(), gameName, whitePlayer, blackPlayer);
@@ -339,7 +335,7 @@ public class ServerFacade {
         }
     }
     
-    private static void handleErrorResponse(HttpURLConnection connection) {
+    private void handleErrorResponse(HttpURLConnection connection) {
         try (InputStream is = connection.getErrorStream()) {
             if (is != null) {
                 String error = new String(is.readAllBytes());
@@ -351,8 +347,11 @@ public class ServerFacade {
         }
     }
 
-    public static void observeGame(String gameId) {
-        printGame(new ChessGame().getBoard(), true);
+    public void observeGame(String gameId) {
+        int gameIdInt = Integer.parseInt(gameId);
+        String gameKey = new ArrayList<>(gameList.keySet()).get(gameIdInt - 1);
+        ChessGame chessGame = gameList.get(gameKey);
+        printGame(chessGame.getBoard(), true);
     }
 
     public static void printGame(ChessBoard board, boolean white){
@@ -402,4 +401,6 @@ public class ServerFacade {
             System.out.println("Ruh Roh Raggy...");
         }
     }
+
+
 }
