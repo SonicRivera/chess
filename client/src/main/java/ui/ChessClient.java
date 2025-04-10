@@ -8,6 +8,7 @@ import client.WebSocketClient;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -22,6 +23,7 @@ public class ChessClient {
     private String serverURL;
     ChessGame chessGame;
     WebSocketClient ws;
+    int dbGameID;
 
 
 
@@ -223,8 +225,8 @@ public class ChessClient {
     }
 
     private void handleLeaveCommand() {
-        // Do stuff with the friggin WebSocket
         state = State.SIGNEDIN;
+        leave(dbGameID);
     }
 
     private void handleRedrawCommand() {
@@ -342,12 +344,14 @@ public class ChessClient {
         Boolean success = (Boolean) data.get("bool");
         Boolean team = (Boolean) data.get("color");
 
+
         if (success) {
             state = State.PLAYING;
             chessGame = (ChessGame) data.get("chessGame");
-            server.printGame(chessGame.getBoard(), team);
+            dbGameID = Integer.parseInt(data.get("gameID").toString());
+//            server.printGame(chessGame.getBoard(), team);
             connectWS();
-            joinPlayer(Integer.parseInt(data.get("gameID").toString()), team);
+            joinPlayer(dbGameID, team);
         }
     }
 
@@ -356,9 +360,14 @@ public class ChessClient {
         if (observeArgs.length != 1 || observeArgs[0].isEmpty()) {
             System.out.println(redText + "Please specify the game ID to observe." + resetText);
         } else {
-            server.observeGame(observeArgs[0]);
             state = State.OBSERVING;
             connectWS();
+            Map<String, Object> data = server.observeGame(observeArgs[0]);
+            dbGameID = Integer.parseInt(data.get("gameID").toString());
+            chessGame = (ChessGame) data.get("chessGame");
+            server.printGame(chessGame.getBoard(), true);
+            joinObserver(dbGameID);
+
 
         }
     }
@@ -385,17 +394,17 @@ public class ChessClient {
         sendCommand(new Connect(authToken, gameID, true));
     }
 
-//    public void makeMove(int gameID, ChessMove move) {
-//        sendCommand(new MakeMove(authToken, gameID, move));
-//    }
-//
-//    public void leave(int gameID) {
-//        sendCommand(new Leave(authToken, gameID));
-//    }
-//
-//    public void resign(int gameID) {
-//        sendCommand(new Resign(authToken, gameID));
-//    }
+    public void makeMove(int gameID, ChessMove move) {
+        sendCommand(new MakeMove(authToken, gameID, move));
+    }
+
+    public void leave(int gameID) {
+        sendCommand(new Leave(authToken, gameID));
+    }
+
+    public void resign(int gameID) {
+        sendCommand(new Resign(authToken, gameID));
+    }
 
 
 }

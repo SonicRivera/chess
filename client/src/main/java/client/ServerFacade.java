@@ -250,14 +250,14 @@ public class ServerFacade {
                     ChessGame chessGame = gameList.get(gameKey);
                     data.put("bool", true);
                     data.put("chessGame", chessGame);
-                    data.put("gameID", game);
+                    data.put("gameID", gameKey);
                     data.put("color", true);
                     return data;
                 } else {
                     ChessGame chessGame = gameList.get(gameKey);
                     data.put("bool", true);
                     data.put("chessGame", chessGame);
-                    data.put("gameID", game);
+                    data.put("gameID", gameKey);
                     data.put("color", false);
                     return data;
                 }
@@ -347,11 +347,14 @@ public class ServerFacade {
         }
     }
 
-    public void observeGame(String gameId) {
+    public Map<String, Object> observeGame(String gameId) {
+        Map<String, Object> data = new HashMap<>();
         int gameIdInt = Integer.parseInt(gameId);
         String gameKey = new ArrayList<>(gameList.keySet()).get(gameIdInt - 1);
         ChessGame chessGame = gameList.get(gameKey);
-        printGame(chessGame.getBoard(), true);
+        data.put("chessGame", chessGame);
+        data.put("gameID", gameKey);
+        return data;
     }
 
     public static void printGame(ChessBoard board, boolean white){

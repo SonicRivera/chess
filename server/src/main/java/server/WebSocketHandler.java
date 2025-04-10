@@ -1,14 +1,26 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import com.google.gson.JsonParser;
+import model.AuthData;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import websocket.commands.UserGameCommand;
+
+import websocket.commands.*;
+import websocket.messages.LoadGame;
+import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
+
+import java.io.IOException;
+import java.util.Objects;
 
 @WebSocket
 public class WebSocketHandler {
@@ -20,24 +32,38 @@ public class WebSocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) {
+    public void onMessage(Session session, String message) throws Exception{
         System.out.println("Message received: " + message);
-        UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
 
-        switch (command.getCommandType()) {
-            case CONNECT:
-                handleConnect(command, session);
-                break;
-            case MAKE_MOVE:
-                handleMakeMove(command, session);
-                break;
-            case LEAVE:
-                handleLeave(command, session);
-                break;
-            case RESIGN:
-                handleResign(command, session);
-                break;
-        }
+    // Parse the commandType field
+    JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+    String commandType = jsonObject.get("commandType").getAsString();
+
+    // Deserialize into the appropriate subclass based on commandType
+    UserGameCommand command;
+    switch (commandType) {
+        case "CONNECT":
+            command = new Gson().fromJson(message, Connect.class);
+            Server.gameSessions.replace(session, command.getGameID());
+            handleConnect((Connect) command, session);
+            break;
+        case "MAKE_MOVE":
+            command = new Gson().fromJson(message, MakeMove.class);
+            handleMakeMove((MakeMove) command, session);
+            break;
+        case "LEAVE":
+            command = new Gson().fromJson(message, Leave.class);
+            handleLeave((Leave) command, session);
+            break;
+        case "RESIGN":
+            command = new Gson().fromJson(message, Resign.class);
+            handleResign((Resign) command, session);
+            break;
+        default:
+            System.err.println("Unknown commandType: " + commandType);
+            sendError(session, new Error("Unknown commandType: " + commandType));
+            break;
+    }
     }
 
     @OnWebSocketClose
@@ -52,19 +78,37 @@ public class WebSocketHandler {
         System.err.println("Error for client " + session.getRemoteAddress() + ": " + throwable.getMessage());
     }
 
-    private void handleConnect(UserGameCommand command, Session session) {
+    private void handleConnect(Connect command, Session session) throws IOException {
         System.out.println("Handling CONNECT for gameID: " + command.getGameID());
 
-        // Send LOAD_GAME message to the client
-        ServerMessage loadGameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-        session.getRemote().sendStringByFuture(new Gson().toJson(loadGameMessage));
+        try {
+            AuthData auth = Server.userService.getAuth(command.getAuthToken());
+            GameData game = Server.gameService.getGameData(command.getAuthToken(), command.getGameID());
 
-        // Notify other clients about the new connection
-        ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        for (Session client : Server.gameSessions.keySet()) {
-            if (!client.equals(session)) {
-                client.getRemote().sendStringByFuture(new Gson().toJson(notificationMessage));
+            ChessGame.TeamColor joiningColor = command.getColor().toString().equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+
+            boolean correctColor;
+            if (joiningColor == ChessGame.TeamColor.WHITE) {
+                correctColor = Objects.equals(game.whiteUsername(), auth.username());
             }
+            else {
+                correctColor = Objects.equals(game.blackUsername(), auth.username());
+            }
+
+            if (!correctColor) {
+                Error error = new Error("Error: attempting to join with wrong color");
+                sendError(session, error);
+                return;
+            }
+
+            Notification notif = new Notification("%s has joined the game as %s".formatted(auth.username(), command.getColor().toString()));
+            broadcastMessage(session, notif);
+
+            LoadGame load = new LoadGame(game.game());
+            sendMessage(session, load);
+        }
+        catch (Exception e) {
+            sendError(session, new Error("Error: Not authorized"));
         }
     }
 
@@ -82,4 +126,33 @@ public class WebSocketHandler {
         System.out.println("Handling RESIGN");
         // Notify all clients and mark game as over
     }
+
+    // Send notification to all clients on current game except user
+    public void broadcastMessage(Session user, ServerMessage message) throws IOException {
+        broadcastMessage(user, message, false);
+    }
+
+    // Send the notification to all clients on the current game
+    public void broadcastMessage(Session user, ServerMessage message, boolean toSelf) throws IOException {
+        System.out.printf("Broadcasting (toSelf: %s): %s%n", toSelf, new Gson().toJson(message));
+        for (Session session : Server.gameSessions.keySet()) {
+            boolean inAGame = Server.gameSessions.get(session) != 0;
+            boolean sameGame = Server.gameSessions.get(session).equals(Server.gameSessions.get(user));
+            boolean isSelf = session == user;
+            if ((toSelf || !isSelf) && inAGame && sameGame) {
+                sendMessage(session, message);
+            }
+        }
+    }
+
+    public void sendMessage(Session session, ServerMessage message) throws IOException {
+        session.getRemote().sendString(new Gson().toJson(message));
+    }
+
+
+    private void sendError(Session session, Error error) throws IOException {
+        System.out.printf("Error: %s%n", new Gson().toJson(error));
+        session.getRemote().sendString(new Gson().toJson(error));
+    }
+
 }

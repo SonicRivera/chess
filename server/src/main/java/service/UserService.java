@@ -64,4 +64,12 @@ public class UserService {
         userDAO.clear();
         authDAO.clear();
     }
+
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        try {
+            return authDAO.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("401: Unauthorized");
+        }
+    }
 }

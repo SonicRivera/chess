@@ -98,4 +98,18 @@ public class GameService {
     public void clear() throws DataAccessException {
         gameDAO.clear();
     }
+
+    public GameData getGameData(String authToken, int gameID) throws DataAccessException {
+        try {
+            authDAO.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("401: Unauthorized");
+        }
+
+        try {
+            return gameDAO.getGame(gameID);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("400: Bad Request");
+        }
+    }
 }
