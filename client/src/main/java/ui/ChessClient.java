@@ -1,28 +1,26 @@
 package ui;
 
-
 import chess.*;
 import client.ServerFacade;
 import client.WebSocketClient;
 import com.google.gson.Gson;
-
 import java.util.*;
-
-
+import ui.handlers.SignedInCommandHandler;
+import ui.handlers.SignedOutCommandHandler;
 import websocket.commands.*;
 
 public class ChessClient {
 
-    private final ServerFacade server;
+    public final ServerFacade server;
     public State state = State.SIGNEDOUT;
-    private String authToken = null;
+    public String authToken = null;
     private String serverURL;
     public ChessGame chessGame;
     WebSocketClient ws;
     int dbGameID;
     boolean playerColor;
-
-
+    private final SignedOutCommandHandler signedOutHandler;
+    private final SignedInCommandHandler signedInHandler;
 
     // Colors
     String redText = EscapeSequences.SET_TEXT_COLOR_RED;
@@ -31,11 +29,11 @@ public class ChessClient {
     String resetText = EscapeSequences.RESET_TEXT_COLOR;
 
 
-
-
     public ChessClient(String serverUrl){
         this.serverURL = serverUrl;
         server = new ServerFacade(serverUrl);
+        this.signedOutHandler = new SignedOutCommandHandler(this);
+        this.signedInHandler = new SignedInCommandHandler(this);
     }
 
     public void eval(String command) {
@@ -45,10 +43,10 @@ public class ChessClient {
         // Dispatch commands based on state
         switch (state) {
             case SIGNEDOUT:
-                handleSignedOutCommands(parsedCommand);
+                signedOutHandler.handleCommand(parsedCommand.baseCommand, parsedCommand.arguments);
                 break;
             case SIGNEDIN:
-                handleSignedInCommands(parsedCommand);
+                signedInHandler.handleCommand(parsedCommand.baseCommand, parsedCommand.arguments);
                 break;
             case PLAYING:
                 handlePlayingCommands(parsedCommand);
@@ -84,57 +82,6 @@ public class ChessClient {
         String baseCommand = parts[0].toLowerCase();
         String arguments = (parts.length > 1) ? parts[1] : "";
         return new Command(baseCommand, arguments);
-    }
-
-    // Handle commands when the user is signed out
-    private void handleSignedOutCommands(Command command) {
-        String baseCommand = command.baseCommand;
-        String arguments = command.arguments;
-
-        switch (baseCommand) {
-            case "help":
-            case "h":
-                printSignedOutHelp();
-                break;
-            case "register":
-                handleRegisterCommand(arguments);
-                break;
-            case "login":
-                handleLoginCommand(arguments);
-                break;
-            default:
-                handleUnknownCommand();
-        }
-    }
-
-    // Handle commands when the user is signed in
-    private void handleSignedInCommands(Command command) {
-        String baseCommand = command.baseCommand;
-        String arguments = command.arguments;
-
-        switch (baseCommand) {
-            case "help":
-            case "h":
-                printSignedInHelp();
-                break;
-            case "logout":
-                handleLogoutCommand();
-                break;
-            case "create":
-                handleCreateCommand(arguments);
-                break;
-            case "list":
-                server.listGames(authToken);
-                break;
-            case "join":
-                handleJoinCommand(arguments);
-                break;
-            case "observe":
-                handleObserveCommand(arguments);
-                break;
-            default:
-                handleUnknownCommand();
-        }
     }
 
     private void handlePlayingCommands(Command command) {
@@ -348,11 +295,11 @@ public class ChessClient {
     }
 
     // Handle unknown commands
-    private void handleUnknownCommand() {
+    public void handleUnknownCommand() {
         System.out.println("Unknown command. Type 'help' for a list of commands.");
     }
 
-    private void printSignedOutHelp(){
+    public void printSignedOutHelp(){
         System.out.println(blueText + "register " + yellowText + "<USERNAME> <PASSWORD> <EMAIL>" +
         resetText + " - account creation");
         System.out.println(blueText + "login " + yellowText + "<USERNAME> <PASSWORD>" +
@@ -361,7 +308,7 @@ public class ChessClient {
         System.out.println(blueText + "help" + resetText + " - Show possible commands");
     }
 
-    private void printSignedInHelp(){
+    public void printSignedInHelp(){
         System.out.println(blueText + "help" + resetText + " - Show possible commands");
         System.out.println(blueText + "logout" + resetText + " - Logs you out");
         System.out.println(blueText + "create " + yellowText + "<NAME>" + resetText + " - creates a game of chess");
@@ -370,7 +317,7 @@ public class ChessClient {
         System.out.println(blueText + "observe " + yellowText + "<ID>" + resetText + " - watch a game of chess");
     }
 
-    private void handleRegisterCommand(String arguments){
+    public void handleRegisterCommand(String arguments){
         String[] regArgs = arguments.split("\\s+");
         if (regArgs.length < 3) {
             System.out.println(redText + "Missing a username, password, and/or an email");
@@ -385,7 +332,7 @@ public class ChessClient {
         }
     }
 
-    private void handleLoginCommand(String arguments){
+    public void handleLoginCommand(String arguments){
         String[] loginArgs = arguments.split("\\s+");
         if (loginArgs.length < 2) {
             System.out.println(redText + "Missing either a username or a password.");
@@ -401,7 +348,7 @@ public class ChessClient {
         }
     }
 
-    private void handleLogoutCommand(){
+    public void handleLogoutCommand(){
         System.out.println(yellowText + "Logging out..." + resetText);
         if(server.logout(authToken)){
             authToken = null;
@@ -409,7 +356,7 @@ public class ChessClient {
         }
     }
 
-    private void handleCreateCommand(String arguments){
+    public void handleCreateCommand(String arguments){
         if (arguments.isEmpty()) {
             System.out.println(redText + "You must provide a game name." + resetText);
         } else {
@@ -418,7 +365,7 @@ public class ChessClient {
         }
     }
 
-    private void handleJoinCommand(String arguments){
+    public void handleJoinCommand(String arguments){
         String[] joinArgs = arguments.split("\\s+");
         if (joinArgs.length < 2 || joinArgs[0].isEmpty()) {
             System.out.println(redText + "Please specify the game ID and a team color to join." + resetText);
@@ -442,7 +389,6 @@ public class ChessClient {
         Map<String, Object> data = server.joinGame(gameId, color, authToken);
         Boolean success = (Boolean) data.get("bool");
 
-
         if (success) {
             state = State.PLAYING;
             chessGame = (ChessGame) data.get("chessGame");
@@ -457,7 +403,7 @@ public class ChessClient {
         return (Boolean) data.get("color");
     }
 
-    private void handleObserveCommand(String arguments){
+    public void handleObserveCommand(String arguments){
         String[] observeArgs = arguments.split("\\s+");
         if (observeArgs.length != 1 || observeArgs[0].isEmpty()) {
             System.out.println(redText + "Please specify the game ID to observe." + resetText);
@@ -470,8 +416,6 @@ public class ChessClient {
             playerColor = true;
             printGame(chessGame.getBoard());
             joinObserver(dbGameID);
-
-
         }
     }
 
@@ -510,8 +454,6 @@ public class ChessClient {
     }
 
     public void printGame(ChessBoard board){
-        
-        
         String color;
         String columnLabels = playerColor ? "\u001b[100m a  b  c  d  e  f  g  h    \u001b[0m" : "\u001b[100m h  g  f  e  d  c  b  a    \u001b[0m";
         System.out.println(columnLabels);
@@ -534,10 +476,7 @@ public class ChessClient {
             }
             System.out.println("\u001b[100m " + (i + 1) + " \u001b[0m");
         }
-
         System.out.println(columnLabels);
         System.out.println();
     }
-
-
 }
