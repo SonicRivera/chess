@@ -414,7 +414,6 @@ public class ChessClient {
             dbGameID = Integer.parseInt(data.get("gameID").toString());
             chessGame = (ChessGame) data.get("chessGame");
             playerColor = true;
-            printGame(chessGame.getBoard());
             joinObserver(dbGameID);
         }
     }
